@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>第三方接口反推提示词</title>
+    <title>同款模板提示词生成器</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
@@ -12,8 +12,8 @@
         <aside class="left-panel">
           <div class="brand-row">
             <div>
-              <p class="eyebrow">apis.cccjin.cn</p>
-              <h1>参考图反推提示词</h1>
+              <p class="eyebrow">Template Prompt</p>
+              <h1>同款模板提示词</h1>
             </div>
             <span class="status-pill" id="apiStatus">等待配置</span>
           </div>
@@ -21,8 +21,8 @@
           <label class="drop-zone" id="dropZone" for="imageInput">
             <input id="imageInput" type="file" accept="image/*" />
             <span class="drop-icon">+</span>
-            <strong>上传参考图</strong>
-            <small>图片会通过第三方视觉模型分析，不再使用本地取色或本地识别</small>
+            <strong>上传效果参考图</strong>
+            <small>上传“原图 + 提示词”生成后的效果图，提取可套用到你本人照片的同款模板</small>
           </label>
 
           <div class="preview-wrap" id="previewWrap">
@@ -52,53 +52,50 @@
               </select>
             </label>
             <button class="secondary-button wide-button" id="checkModelsButton" type="button">检测可用模型</button>
-            <button class="ghost-button wide-button" id="generateButton" type="button">调用接口生成</button>
-            <p class="hint" id="apiHint">如果提示服务暂不可用，通常是当前模型通道不可用。先点“检测可用模型”，再换一个支持图片输入的模型。</p>
+            <button class="ghost-button wide-button" id="generateButton" type="button">生成同款模板</button>
+            <p class="hint" id="apiHint">站点会调用第三方视觉模型提取模板，不使用本地识别。</p>
           </div>
         </aside>
 
         <section class="right-panel">
           <div class="toolbar">
             <div>
-              <p class="eyebrow">Prompt Targets</p>
-              <h2>ChatGPT / Hypic 中英双语</h2>
+              <p class="eyebrow">Reusable Template</p>
+              <h2>套用到自己的照片</h2>
             </div>
             <button class="ghost-button" id="copyAllButton" type="button">复制全部</button>
           </div>
 
           <div class="controls">
             <label>
-              主体补充
-              <input id="subjectInput" type="text" placeholder="可选：例如 人像、产品海报、未来城市街景" />
+              你的照片主体
+              <input id="subjectInput" type="text" placeholder="例如：我上传的人像照片、我的半身照、我的产品照片" />
             </label>
             <label>
               输出用途
               <select id="goalSelect">
-                <option value="用于生图">用于生图</option>
-                <option value="用于反推图片提示词">用于反推图片提示词</option>
-                <option value="用于生成同款变体">用于生成同款变体</option>
-                <option value="用于优化已有提示词">用于优化已有提示词</option>
+                <option value="用自己的照片生成同款图片">用自己的照片生成同款图片</option>
+                <option value="保留本人脸部特征并生成同款场景">保留本人脸部特征并生成同款场景</option>
+                <option value="生成适合 ChatGPT/Hypic 的同款模板">生成适合 ChatGPT/Hypic 的同款模板</option>
+                <option value="提取参考图结构并替换为新主体">提取参考图结构并替换为新主体</option>
               </select>
             </label>
             <label>
-              画面类型
+              替换策略
               <select id="sceneSelect">
-                <option value="根据参考图自动判断">根据参考图自动判断</option>
-                <option value="人物写真">人物写真</option>
-                <option value="产品摄影">产品摄影</option>
-                <option value="场景风光">场景风光</option>
-                <option value="商业海报">商业海报</option>
-                <option value="插画设定">插画设定</option>
+                <option value="只替换人物身份，保留场景、构图、动作和特效">只替换人物身份，保留场景、构图、动作和特效</option>
+                <option value="替换人物和服装，保留场景结构和视觉冲击">替换人物和服装，保留场景结构和视觉冲击</option>
+                <option value="替换产品主体，保留广告构图和光影">替换产品主体，保留广告构图和光影</option>
+                <option value="替换主体，保留参考图的整体风格">替换主体，保留参考图的整体风格</option>
               </select>
             </label>
             <label>
               保留重点
               <select id="focusSelect">
-                <option value="构图、色调、光影、氛围都保留">构图、色调、光影、氛围都保留</option>
-                <option value="重点保留构图">重点保留构图</option>
-                <option value="重点保留色调">重点保留色调</option>
-                <option value="重点保留光影">重点保留光影</option>
-                <option value="重点保留风格">重点保留风格</option>
+                <option value="强还原构图、动作、场景、特效和电影感">强还原构图、动作、场景、特效和电影感</option>
+                <option value="重点保留构图和主体姿态">重点保留构图和主体姿态</option>
+                <option value="重点保留光影、色调和氛围">重点保留光影、色调和氛围</option>
+                <option value="重点保留特效、材质和视觉冲击">重点保留特效、材质和视觉冲击</option>
               </select>
             </label>
           </div>
@@ -106,34 +103,34 @@
           <div class="output-grid prompt-output-grid">
             <section class="prompt-card">
               <div class="section-title">
-                <span>ChatGPT 中文提示词</span>
+                <span>ChatGPT 中文模板</span>
                 <button class="text-button copy-one" data-copy="chatgptCn" type="button">复制</button>
               </div>
-              <textarea id="chatgptCnOutput" spellcheck="false" placeholder="上传图片并点击“调用接口生成”"></textarea>
+              <textarea id="chatgptCnOutput" spellcheck="false" placeholder="上传效果图并点击“生成同款模板”"></textarea>
             </section>
 
             <section class="prompt-card">
               <div class="section-title">
-                <span>ChatGPT English Prompt</span>
+                <span>ChatGPT English Template</span>
                 <button class="text-button copy-one" data-copy="chatgptEn" type="button">复制</button>
               </div>
-              <textarea id="chatgptEnOutput" spellcheck="false" placeholder="Upload an image and click generate"></textarea>
+              <textarea id="chatgptEnOutput" spellcheck="false" placeholder="Upload a result image and generate a reusable template"></textarea>
             </section>
 
             <section class="prompt-card">
               <div class="section-title">
-                <span>Hypic 中文提示词</span>
+                <span>Hypic 中文模板</span>
                 <button class="text-button copy-one" data-copy="hypicCn" type="button">复制</button>
               </div>
-              <textarea id="hypicCnOutput" spellcheck="false" placeholder="上传图片并点击“调用接口生成”"></textarea>
+              <textarea id="hypicCnOutput" spellcheck="false" placeholder="上传效果图并点击“生成同款模板”"></textarea>
             </section>
 
             <section class="prompt-card">
               <div class="section-title">
-                <span>Hypic English Prompt</span>
+                <span>Hypic English Template</span>
                 <button class="text-button copy-one" data-copy="hypicEn" type="button">复制</button>
               </div>
-              <textarea id="hypicEnOutput" spellcheck="false" placeholder="Upload an image and click generate"></textarea>
+              <textarea id="hypicEnOutput" spellcheck="false" placeholder="Upload a result image and generate a reusable template"></textarea>
             </section>
           </div>
         </section>

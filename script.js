@@ -59,31 +59,33 @@ async function loadServerConfig() {
 }
 
 function buildInstruction() {
-  return `你是一个“图片反推短提示词”生成器。请看用户上传的参考图，反推出接近原始生图 prompt 的短提示词，不要写成长篇分析说明。
+  return `你是一个“参考效果图转同款模板提示词”的生成器。用户上传的图片是一张由“原图 + 提示词”生成出来的效果图。你的任务不是普通描述图片，而是反推出一个可复用模板，让用户之后上传自己的真人照片或主体照片，也能生成同款效果。
 
-目标风格：像这种短、直接、关键词密集的原始提示词：
-"generate a dramatic photo realistic scene of this guy in stylish jeans and green scarf clothes confidently walking out of a giant smartphone screen, the phone screen resembles a tiktok profile, the glass of the phone is shattered with shards flying outward, dynamic cinematic filter"
+核心目标：输出的提示词必须能直接配合用户自己的照片使用。提示词里必须明确写：以我上传的人物照片/主体照片为主角，保持五官、发型、肤色、脸部特征、身份一致，只把这个人套进参考图的同款场景、动作、构图、特效、光影和风格里。
 
 用户补充：
-- 主体补充：${els.subjectInput.value.trim() || "无，按参考图判断"}
+- 你的照片主体：${els.subjectInput.value.trim() || "我上传的人物照片"}
 - 输出用途：${els.goalSelect.value}
-- 画面类型：${els.sceneSelect.value}
+- 替换策略：${els.sceneSelect.value}
 - 保留重点：${els.focusSelect.value}
 
 生成规则：
-1. 每条提示词只写一段，不要分点，不要解释。
-2. 长度控制在 45-90 个英文词；中文控制在 80-150 个汉字。
-3. 必须强还原参考图的核心：主体、服装、动作、巨型手机、社交媒体主页界面、碎裂玻璃飞溅、动态电影感、暗灰背景、写实质感。
-4. 不要过度添加不存在的细节，不要写成长篇商业海报分析。
-5. 如果参考图里有水印、真实用户名或平台 logo，不要要求复刻具体文字；只写“社交媒体主页界面 / short-video profile interface”。
-6. 中文版要像可直接发给生图模型的中文提示词；英文版要像原始英文 prompt 的自然表达。
+1. 输出的是“可复用同款模板”，不是对参考图的普通描述。
+2. 每条提示词只写一段，不要分点，不要解释。
+3. 中文控制在 120-220 个汉字；英文控制在 70-130 个词。
+4. 必须包含身份一致性指令：保留上传照片中人物的五官、发型、肤色、脸型和真实身份。
+5. 必须抽取参考图的同款结构：主体动作、场景设定、构图、镜头、光影、色调、材质、特效、氛围。
+6. 不要固定参考图中人物的具体身份，不要写死“这个男生/这个女生”，要写“上传照片中的人物 / the person from the uploaded photo”。
+7. 如果参考图有水印、用户名、平台 logo 或文字，不要要求复刻真实文字，只保留“社交媒体界面 / profile interface / graphic layout”等可替换结构。
+8. 风格要短、直接、效果导向，像原始生图 prompt，而不是长篇分析报告。
+9. ChatGPT 版本可以稍微更明确地告诉 ChatGPT 使用上传照片做身份参考；Hypic 版本要更像直接生图 prompt，短一点、更关键词化。
 
 输出必须是 JSON，不要 Markdown，不要代码块：
 {
-  "chatgpt_cn": "简短中文提示词",
-  "chatgpt_en": "short English prompt",
-  "hypic_cn": "简短中文提示词",
-  "hypic_en": "short English prompt"
+  "chatgpt_cn": "用于 ChatGPT 的中文同款模板提示词",
+  "chatgpt_en": "English reusable template prompt for ChatGPT",
+  "hypic_cn": "用于 Hypic 的中文同款模板提示词",
+  "hypic_en": "English reusable template prompt for Hypic"
 }`;
 }
 function extractJson(text) {
@@ -236,7 +238,7 @@ async function callThirdPartyApi() {
     els.hypicEnOutput.value = "";
   } finally {
     els.generateButton.disabled = false;
-    els.generateButton.textContent = "调用接口生成";
+    els.generateButton.textContent = "生成同款模板";
   }
 }
 
@@ -304,10 +306,10 @@ els.modelSelect.addEventListener("change", () => {
 els.copyAllButton.addEventListener("click", () => {
   copyText(
     [
-      `ChatGPT 中文提示词：\n${els.chatgptCnOutput.value}`,
-      `ChatGPT English Prompt:\n${els.chatgptEnOutput.value}`,
-      `Hypic 中文提示词：\n${els.hypicCnOutput.value}`,
-      `Hypic English Prompt:\n${els.hypicEnOutput.value}`,
+      `ChatGPT 中文模板：\n${els.chatgptCnOutput.value}`,
+      `ChatGPT English Template:\n${els.chatgptEnOutput.value}`,
+      `Hypic 中文模板：\n${els.hypicCnOutput.value}`,
+      `Hypic English Template:\n${els.hypicEnOutput.value}`,
     ].join("\n\n"),
     els.copyAllButton,
     "复制全部",
@@ -327,4 +329,5 @@ document.querySelectorAll(".copy-one").forEach((button) => {
     copyText(target.value, button, "复制");
   });
 });
+
 
