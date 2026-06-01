@@ -101,15 +101,18 @@ generate a dramatic photo realistic scene of this guy in stylish jeans and green
 }
 
 function buildCaptionInstruction() {
-  const language = els.copyLanguageInput.value.trim() || "印尼语";
+  const languages = getSelectedCaptionLanguages();
+  if (!languages.length) languages.push("印尼语");
+  const languageText = languages.join("、");
   const type = els.copyTypeSelect.value;
   const subject = els.subjectInput.value.trim() || "按图片主体判断";
 
-  return `你是一个 TikTok 短视频文案生成器。请根据用户上传的图片，生成适合 TikTok 发布的长文案。文案语言必须是：${language}。
+  return `你是一个 TikTok 短视频文案生成器。请根据用户上传的图片，生成适合 TikTok 发布的长文案。文案语言必须是：${languageText}。
 
 用户补充：
 - 图片主体：${subject}
 - 文案类型：${type === "all" ? "全部生成" : type}
+- 选中的文案语言：${languageText}
 
 文案必须模仿这种结构：
 1. 平台标签可放在开头，尤其是 CapCut/Hypic 类文案，像 TikTok 爆款文案一样先吃平台流量。
@@ -128,13 +131,20 @@ function buildCaptionInstruction() {
 写作要求：
 - 如果文案类型是全部生成，就三个字段都输出完整文案。
 - 如果只选择某一种类型，仍然输出 JSON 三个字段，但未选择的字段填空字符串。
+- 如果选择了多种语言，每一个非空字段都必须按照所有选中语言分别生成完整文案。格式用英文语言标签分隔，例如：
+  [Indonesian]
+  完整印尼语文案
+
+  [Thai]
+  完整泰语文案
+  选择几种语言就输出几段，不要漏掉任何一种语言。
 - 每个文案必须是可直接复制到 TikTok 的完整发布文案。
 - 文案整体要像 TikTok 达人主页里的爆款 SEO 长文案，不要像普通广告文案；允许关键词重复、短语堆叠、教程句反复变体。
-- 根据所选语言输出主体内容；如果图片风格适合跨区流量，可以少量混入 English AI/search keywords，但主体语言必须保持为所选语言。
+- 根据每个所选语言分别输出主体内容；如果图片风格适合跨区流量，可以少量混入 English AI/search keywords，但每段主体语言必须保持为该段对应语言。
 - CapCut 拉失活文案要更直接地召回用户打开 CapCut，例如强调“现在就打开 CapCut”“这个模板别错过”“用旧照片也能做同款”。
 - hashtag 要少而准：Hypic 文案固定 4 个强制标签后最多再加 1 个；CapCut 文案固定 2 个强制标签后最多再加 3 个；CapCut 拉失活文案固定 3 个强制标签后最多再加 2 个。
 - 不要 Markdown，不要解释，不要分代码块。
-- 绝对不要输出中文汉字。当前文案语言选项不包含中文，所以 hypic_caption、capcut_caption、capcut_reactivation_caption 三个字段里都不能出现中文标题、中文解释、中文小节名或中文标签。
+- 绝对不要输出中文汉字。当前文案语言选项不包含中文，所以 hypic_caption、capcut_caption、capcut_reactivation_caption 三个字段里都不能出现中文标题、中文解释、中文小节名或中文标签。语言分隔标题也必须用英文，例如 [Indonesian]、[Thai]、[Russian]。
 - 不要编造真实姓名，图片里看不清身份时用通用称呼。
 - 图片提示词要具体到这张图的视觉元素，不能只写“生成同款图片”。
 
@@ -144,6 +154,10 @@ function buildCaptionInstruction() {
   "capcut_caption": "CapCut 完整文案",
   "capcut_reactivation_caption": "CapCut 拉失活完整文案"
 }`;
+}
+
+function getSelectedCaptionLanguages() {
+  return [...els.copyLanguageInput.selectedOptions].map((option) => option.value.trim()).filter(Boolean);
 }
 
 function extractJson(text) {
@@ -185,6 +199,9 @@ function ensureHashtags(text, requiredTags, maxTags = 5) {
 }
 
 function stripChineseText(text) {
+  const languages = getSelectedCaptionLanguages();
+  const allowCjkText = languages.some((language) => ["日语", "韩语"].includes(language));
+  if (allowCjkText) return String(text || "").trim();
   return String(text || "")
     .replace(/[\u3400-\u9fff]+/g, "")
     .replace(/[ \t]{2,}/g, " ")

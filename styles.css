@@ -324,6 +324,13 @@ label {
   gap: 8px;
 }
 
+.field-hint {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
 input,
 select,
 textarea {
@@ -339,6 +346,12 @@ input,
 select {
   height: 44px;
   padding: 0 12px;
+}
+
+select[multiple] {
+  height: auto;
+  min-height: 180px;
+  padding: 8px 12px;
 }
 
 input:focus,
