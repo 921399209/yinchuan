@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>第三方接口反推提示词</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="workspace">
+        <aside class="left-panel">
+          <div class="brand-row">
+            <div>
+              <p class="eyebrow">apis.cccjin.cn</p>
+              <h1>参考图反推提示词</h1>
+            </div>
+            <span class="status-pill" id="apiStatus">等待配置</span>
+          </div>
+
+          <label class="drop-zone" id="dropZone" for="imageInput">
+            <input id="imageInput" type="file" accept="image/*" />
+            <span class="drop-icon">+</span>
+            <strong>上传参考图</strong>
+            <small>图片会通过第三方视觉模型分析，不再使用本地取色或本地识别</small>
+          </label>
+
+          <div class="preview-wrap" id="previewWrap">
+            <img id="previewImage" alt="参考图预览" />
+          </div>
+
+          <div class="api-panel">
+            <label id="apiKeyField">
+              API Key
+              <input id="apiKeyInput" type="password" placeholder="sk-..." autocomplete="off" />
+            </label>
+            <label>
+              视觉模型
+              <input id="modelInput" type="text" value="gemini-2.5-flash" list="modelSuggestions" />
+              <datalist id="modelSuggestions">
+                <option value="gemini-2.5-flash"></option>
+                <option value="gemini-2.0-flash"></option>
+                <option value="gpt-4o"></option>
+                <option value="gpt-4o-mini"></option>
+                <option value="claude-3-5-sonnet-latest"></option>
+              </datalist>
+            </label>
+            <label>
+              可用模型列表
+              <select id="modelSelect">
+                <option value="">先检测模型</option>
+              </select>
+            </label>
+            <button class="secondary-button wide-button" id="checkModelsButton" type="button">检测可用模型</button>
+            <button class="ghost-button wide-button" id="generateButton" type="button">调用接口生成</button>
+            <p class="hint" id="apiHint">如果提示服务暂不可用，通常是当前模型通道不可用。先点“检测可用模型”，再换一个支持图片输入的模型。</p>
+          </div>
+        </aside>
+
+        <section class="right-panel">
+          <div class="toolbar">
+            <div>
+              <p class="eyebrow">Prompt Targets</p>
+              <h2>ChatGPT / Hypic 中英双语</h2>
+            </div>
+            <button class="ghost-button" id="copyAllButton" type="button">复制全部</button>
+          </div>
+
+          <div class="controls">
+            <label>
+              主体补充
+              <input id="subjectInput" type="text" placeholder="可选：例如 人像、产品海报、未来城市街景" />
+            </label>
+            <label>
+              输出用途
+              <select id="goalSelect">
+                <option value="用于生图">用于生图</option>
+                <option value="用于反推图片提示词">用于反推图片提示词</option>
+                <option value="用于生成同款变体">用于生成同款变体</option>
+                <option value="用于优化已有提示词">用于优化已有提示词</option>
+              </select>
+            </label>
+            <label>
+              画面类型
+              <select id="sceneSelect">
+                <option value="根据参考图自动判断">根据参考图自动判断</option>
+                <option value="人物写真">人物写真</option>
+                <option value="产品摄影">产品摄影</option>
+                <option value="场景风光">场景风光</option>
+                <option value="商业海报">商业海报</option>
+                <option value="插画设定">插画设定</option>
+              </select>
+            </label>
+            <label>
+              保留重点
+              <select id="focusSelect">
+                <option value="构图、色调、光影、氛围都保留">构图、色调、光影、氛围都保留</option>
+                <option value="重点保留构图">重点保留构图</option>
+                <option value="重点保留色调">重点保留色调</option>
+                <option value="重点保留光影">重点保留光影</option>
+                <option value="重点保留风格">重点保留风格</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="output-grid prompt-output-grid">
+            <section class="prompt-card">
+              <div class="section-title">
+                <span>ChatGPT 中文提示词</span>
+                <button class="text-button copy-one" data-copy="chatgptCn" type="button">复制</button>
+              </div>
+              <textarea id="chatgptCnOutput" spellcheck="false" placeholder="上传图片并点击“调用接口生成”"></textarea>
+            </section>
+
+            <section class="prompt-card">
+              <div class="section-title">
+                <span>ChatGPT English Prompt</span>
+                <button class="text-button copy-one" data-copy="chatgptEn" type="button">复制</button>
+              </div>
+              <textarea id="chatgptEnOutput" spellcheck="false" placeholder="Upload an image and click generate"></textarea>
+            </section>
+
+            <section class="prompt-card">
+              <div class="section-title">
+                <span>Hypic 中文提示词</span>
+                <button class="text-button copy-one" data-copy="hypicCn" type="button">复制</button>
+              </div>
+              <textarea id="hypicCnOutput" spellcheck="false" placeholder="上传图片并点击“调用接口生成”"></textarea>
+            </section>
+
+            <section class="prompt-card">
+              <div class="section-title">
+                <span>Hypic English Prompt</span>
+                <button class="text-button copy-one" data-copy="hypicEn" type="button">复制</button>
+              </div>
+              <textarea id="hypicEnOutput" spellcheck="false" placeholder="Upload an image and click generate"></textarea>
+            </section>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>

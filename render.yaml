@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: prompt-reverse-site
+    env: python
+    plan: free
+    buildCommand: ""
+    startCommand: python server.py
+    envVars:
+      - key: HOST
+        value: 0.0.0.0
+      - key: CCCJIN_MODEL
+        value: gemini-2.5-flash
+      - key: CCCJIN_API_KEY
+        sync: false
