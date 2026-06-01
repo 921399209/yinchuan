@@ -157,7 +157,9 @@ function buildCaptionInstruction() {
 }
 
 function getSelectedCaptionLanguages() {
-  return [...els.copyLanguageInput.selectedOptions].map((option) => option.value.trim()).filter(Boolean);
+  return [...els.copyLanguageInput.querySelectorAll('input[name="copyLanguage"]:checked')]
+    .map((input) => input.value.trim())
+    .filter(Boolean);
 }
 
 function extractJson(text) {
