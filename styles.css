@@ -1,6 +1,6 @@
 :root {
   color-scheme: light;
-  --bg: #f3f4f1;
+  --bg: #eef3f1;
   --panel: #ffffff;
   --ink: #1e2225;
   --muted: #6f7377;
@@ -20,8 +20,8 @@ body {
   margin: 0;
   min-height: 100vh;
   background:
-    linear-gradient(135deg, rgba(15, 118, 110, 0.08), transparent 34%),
-    linear-gradient(315deg, rgba(217, 119, 6, 0.09), transparent 38%),
+    radial-gradient(circle at top left, rgba(15, 118, 110, 0.12), transparent 30%),
+    linear-gradient(315deg, rgba(217, 119, 6, 0.08), transparent 35%),
     var(--bg);
   color: var(--ink);
   font-family:
@@ -39,12 +39,12 @@ textarea {
   width: min(1440px, 100%);
   min-height: 100vh;
   margin: 0 auto;
-  padding: 28px;
+  padding: 22px;
 }
 
 .workspace {
   display: grid;
-  grid-template-columns: minmax(320px, 420px) minmax(0, 1fr);
+  grid-template-columns: minmax(300px, 390px) minmax(0, 1fr);
   min-height: calc(100vh - 56px);
   overflow: hidden;
   border: 1px solid var(--line);
@@ -55,13 +55,13 @@ textarea {
 
 .left-panel,
 .right-panel {
-  padding: 28px;
+  padding: 24px;
 }
 
 .left-panel {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
   border-right: 1px solid var(--line);
   background: #fafaf7;
 }
@@ -69,7 +69,7 @@ textarea {
 .right-panel {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 18px;
 }
 
 .brand-row,
@@ -98,7 +98,7 @@ textarea {
 
 h1 {
   margin: 0;
-  font-size: clamp(28px, 4vw, 46px);
+  font-size: clamp(27px, 4vw, 40px);
   line-height: 1.05;
   letter-spacing: 0;
 }
@@ -143,7 +143,7 @@ h2 {
   display: grid;
   place-items: center;
   gap: 8px;
-  min-height: 190px;
+  min-height: 172px;
   border: 1px dashed #adb7b4;
   border-radius: 8px;
   background: var(--soft);
@@ -220,7 +220,7 @@ h2 {
 
 .api-panel {
   display: grid;
-  gap: 13px;
+  gap: 12px;
   border: 1px solid var(--line);
   border-radius: 8px;
   padding: 16px;
@@ -279,7 +279,7 @@ label,
 }
 
 .ghost-button {
-  min-height: 42px;
+  min-height: 46px;
   border-radius: 8px;
   padding: 0 18px;
   background: var(--accent);
@@ -292,7 +292,7 @@ label,
 }
 
 .secondary-button {
-  min-height: 42px;
+  min-height: 46px;
   border: 1px solid var(--line);
   border-radius: 8px;
   padding: 0 18px;
@@ -316,7 +316,7 @@ label,
 .output-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
+  gap: 12px;
 }
 
 label {
@@ -334,9 +334,11 @@ label {
 .checkbox-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
+  gap: 7px;
   border: 1px solid var(--line);
   border-radius: 8px;
+  max-height: 260px;
+  overflow: auto;
   padding: 10px;
   background: #fff;
 }
@@ -415,7 +417,7 @@ textarea:focus {
 
 textarea {
   resize: vertical;
-  min-height: 310px;
+  min-height: 260px;
   padding: 14px;
   line-height: 1.55;
 }
@@ -445,7 +447,7 @@ textarea {
 }
 
 .caption-output-grid textarea {
-  min-height: 360px;
+  min-height: 330px;
 }
 
 #analysisCanvas {
@@ -454,23 +456,54 @@ textarea {
 
 @media (max-width: 920px) {
   .shell {
-    padding: 14px;
+    padding: 0;
   }
 
   .workspace {
     grid-template-columns: 1fr;
+    min-height: 100vh;
+    border: 0;
+    border-radius: 0;
   }
 
   .left-panel {
     border-right: 0;
     border-bottom: 1px solid var(--line);
+    position: relative;
   }
 }
 
 @media (max-width: 620px) {
+  body {
+    background: #f6f7f4;
+  }
+
   .left-panel,
   .right-panel {
-    padding: 18px;
+    padding: 16px;
+  }
+
+  h1 {
+    font-size: 30px;
+  }
+
+  h2 {
+    font-size: 20px;
+  }
+
+  .brand-row,
+  .toolbar,
+  .section-title {
+    gap: 10px;
+  }
+
+  .drop-zone {
+    min-height: 150px;
+  }
+
+  .api-panel,
+  .prompt-card {
+    padding: 13px;
   }
 
   .controls,
@@ -484,11 +517,31 @@ textarea {
     flex-direction: column;
   }
 
+  .ghost-button,
+  .secondary-button {
+    min-height: 48px;
+    padding: 0 14px;
+  }
+
+  input,
+  select {
+    height: 46px;
+  }
+
+  textarea {
+    min-height: 230px;
+  }
+
+  .caption-output-grid textarea {
+    min-height: 300px;
+  }
+
   .swatches {
     grid-template-columns: repeat(3, 1fr);
   }
 
   .checkbox-grid {
     grid-template-columns: 1fr;
+    max-height: 230px;
   }
 }

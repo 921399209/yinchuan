@@ -12,9 +12,6 @@ const els = {
   apiKeyField: document.querySelector("#apiKeyField"),
   apiKeyInput: document.querySelector("#apiKeyInput"),
   modelInput: document.querySelector("#modelInput"),
-  modelSelect: document.querySelector("#modelSelect"),
-  modelSuggestions: document.querySelector("#modelSuggestions"),
-  checkModelsButton: document.querySelector("#checkModelsButton"),
   generateButton: document.querySelector("#generateButton"),
   generateCopyButton: document.querySelector("#generateCopyButton"),
   apiHint: document.querySelector("#apiHint"),
@@ -45,9 +42,7 @@ async function loadServerConfig() {
     const response = await fetch("/api/config");
     const config = await response.json();
     serverKeyConfigured = Boolean(config.serverKeyConfigured);
-    if (config.defaultModel && !localStorage.getItem("cccjin_model")) {
-      els.modelInput.value = config.defaultModel;
-    }
+    els.modelInput.value = "GPT-5.5";
     if (serverKeyConfigured) {
       els.apiKeyInput.value = "";
       els.apiKeyInput.placeholder = "已由站点服务器配置";
@@ -55,7 +50,7 @@ async function loadServerConfig() {
       els.apiKeyField.classList.add("hidden-field");
       els.apiKeyField.hidden = true;
       els.apiKeyField.style.display = "none";
-      els.apiHint.textContent = "站点已配置统一 API Key，用户无需填写。上传参考图后直接生成即可。";
+      els.apiHint.textContent = "站点已配置统一 API Key，固定使用 GPT-5.5。上传图片后直接生成即可。";
       setStatus("站点已配置", "ok");
     }
   } catch {
@@ -216,7 +211,7 @@ function readableError(errorText) {
   } catch {}
 
   if (/Service temporarily unavailable/i.test(text)) {
-    return "当前模型或上游通道临时不可用。请点“检测可用模型”，换一个支持图片输入的模型后重试。";
+    return "GPT-5.5 或上游通道临时不可用，请稍后重试。";
   }
   if (/Unauthorized|invalid api key|401/i.test(text)) {
     return "API Key 无效或没有权限，请检查 apis.cccjin.cn 后台生成的 Key。";
@@ -230,78 +225,13 @@ function readableError(errorText) {
   return text;
 }
 
-async function checkModels() {
-  const apiKey = els.apiKeyInput.value.trim();
-  if (!apiKey && !serverKeyConfigured) {
-    setStatus("缺少 API Key", "error");
-    els.apiKeyInput.focus();
-    return;
-  }
-
-  setStatus("检测中", "loading");
-  els.checkModelsButton.disabled = true;
-  els.checkModelsButton.textContent = "正在检测...";
-
-  try {
-    const response = await fetch("/api/models", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ apiKey }),
-    });
-    const payload = await response.json();
-    if (!response.ok) throw new Error(payload.error || `检测失败：${response.status}`);
-
-    const models = payload.models || [];
-    els.modelSuggestions.innerHTML = "";
-    els.modelSelect.innerHTML = "";
-    models.forEach((model) => {
-      const option = document.createElement("option");
-      option.value = model;
-      els.modelSuggestions.appendChild(option);
-
-      const selectOption = document.createElement("option");
-      selectOption.value = model;
-      selectOption.textContent = model;
-      els.modelSelect.appendChild(selectOption);
-    });
-
-    const visualCandidates = models.filter((model) => /gemini|gpt-4o|vision|vl|qwen-vl|claude/i.test(model));
-    const currentModel = els.modelInput.value.trim();
-    if (visualCandidates.length && !visualCandidates.includes(currentModel)) {
-      els.modelInput.value = visualCandidates[0];
-      els.modelSelect.value = visualCandidates[0];
-    } else if (models.includes(currentModel)) {
-      els.modelSelect.value = currentModel;
-    } else if (models.length) {
-      els.modelSelect.value = models[0];
-    }
-
-    els.apiHint.textContent = visualCandidates.length
-      ? `检测到 ${models.length} 个模型。已优先推荐可能支持图片的模型：${visualCandidates.slice(0, 5).join("、")}`
-      : `检测到 ${models.length} 个模型：${models.join("、")}。未能自动识别视觉模型，请从列表中切换模型重试。`;
-    setStatus("模型已更新", "ok");
-  } catch (error) {
-    setStatus("检测失败", "error");
-    els.apiHint.textContent = readableError(error.message);
-  } finally {
-    els.checkModelsButton.disabled = false;
-    els.checkModelsButton.textContent = "检测可用模型";
-  }
-}
-
 async function callThirdPartyApi() {
   const apiKey = els.apiKeyInput.value.trim();
-  const model = els.modelInput.value.trim();
+  const model = "GPT-5.5";
 
   if (!apiKey && !serverKeyConfigured) {
     setStatus("缺少 API Key", "error");
     els.apiKeyInput.focus();
-    return;
-  }
-
-  if (!model) {
-    setStatus("缺少模型名", "error");
-    els.modelInput.focus();
     return;
   }
 
@@ -311,7 +241,7 @@ async function callThirdPartyApi() {
   }
 
   if (apiKey) localStorage.setItem("cccjin_api_key", apiKey);
-  localStorage.setItem("cccjin_model", model);
+  localStorage.setItem("cccjin_model", "GPT-5.5");
   setStatus("调用中", "loading");
   els.generateButton.disabled = true;
   els.generateButton.textContent = "正在调用接口...";
@@ -350,17 +280,11 @@ async function callThirdPartyApi() {
 
 async function generateTikTokCaptions() {
   const apiKey = els.apiKeyInput.value.trim();
-  const model = els.modelInput.value.trim();
+  const model = "GPT-5.5";
 
   if (!apiKey && !serverKeyConfigured) {
     setStatus("缺少 API Key", "error");
     els.apiKeyInput.focus();
-    return;
-  }
-
-  if (!model) {
-    setStatus("缺少模型名", "error");
-    els.modelInput.focus();
     return;
   }
 
@@ -370,7 +294,7 @@ async function generateTikTokCaptions() {
   }
 
   if (apiKey) localStorage.setItem("cccjin_api_key", apiKey);
-  localStorage.setItem("cccjin_model", model);
+  localStorage.setItem("cccjin_model", "GPT-5.5");
   setStatus("生成文案中", "loading");
   els.generateCopyButton.disabled = true;
   els.generateCopyButton.textContent = "正在生成文案...";
@@ -442,7 +366,7 @@ async function copyText(text, button, label) {
 }
 
 els.apiKeyInput.value = localStorage.getItem("cccjin_api_key") || "";
-els.modelInput.value = localStorage.getItem("cccjin_model") || els.modelInput.value;
+els.modelInput.value = "GPT-5.5";
 loadServerConfig();
 
 els.input.addEventListener("change", (event) => {
@@ -474,13 +398,6 @@ document.addEventListener("paste", (event) => {
 
 els.generateButton.addEventListener("click", callThirdPartyApi);
 els.generateCopyButton.addEventListener("click", generateTikTokCaptions);
-els.checkModelsButton.addEventListener("click", checkModels);
-els.modelSelect.addEventListener("change", () => {
-  if (els.modelSelect.value) {
-    els.modelInput.value = els.modelSelect.value;
-    localStorage.setItem("cccjin_model", els.modelSelect.value);
-  }
-});
 
 els.copyAllButton.addEventListener("click", () => {
   copyText(
