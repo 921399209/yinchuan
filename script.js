@@ -118,7 +118,7 @@ function buildCaptionInstruction() {
 4. 一段自然文案：解释这个图片效果、画面风格、适合什么人、为什么容易火，可以多用 ✨📸🔥💖✍️ 等符号增强 TikTok 感。
 5. 一段“图片提示词/教程”：告诉用户把自己的照片发给 ChatGPT/Gemini/Hypic/CapCut 后如何生成同款，必须根据图片内容写具体效果。
 6. 一组相关词语：和图片内容、人物、场景、风格、教程、AI 生成有关，可以用 · 或 ｜ 连接。
-7. 结尾 hashtags：必须包含指定强制话题，同时补充和图片相关的话题。
+7. 结尾 hashtags：必须包含指定强制话题，但每条文案 hashtag 总数不能超过 5 个。图片相关标签最多只补 1-3 个，不要堆标签。
 
 分类规则：
 - hypic_caption 是 Hypic 文案，必须包含这些话题且不能漏：#hypic #hypiccreator #hypicATETHAT #Godpic
@@ -132,6 +132,7 @@ function buildCaptionInstruction() {
 - 文案整体要像 TikTok 达人主页里的爆款 SEO 长文案，不要像普通广告文案；允许关键词重复、短语堆叠、教程句反复变体。
 - 根据所选语言输出主体内容；如果图片风格适合跨区流量，可以少量混入 English AI/search keywords，但主体语言必须保持为所选语言。
 - CapCut 拉失活文案要更直接地召回用户打开 CapCut，例如强调“现在就打开 CapCut”“这个模板别错过”“用旧照片也能做同款”。
+- hashtag 要少而准：Hypic 文案固定 4 个强制标签后最多再加 1 个；CapCut 文案固定 2 个强制标签后最多再加 3 个；CapCut 拉失活文案固定 3 个强制标签后最多再加 2 个。
 - 不要 Markdown，不要解释，不要分代码块。
 - 不要使用中文，除非文案语言选择中文。
 - 不要编造真实姓名，图片里看不清身份时用通用称呼。
@@ -155,11 +156,32 @@ function extractJson(text) {
   }
 }
 
-function ensureHashtags(text, requiredTags) {
+function ensureHashtags(text, requiredTags, maxTags = 5) {
   const source = String(text || "").trim();
   if (!source) return "";
-  const missingTags = requiredTags.filter((tag) => !source.toLowerCase().includes(tag.toLowerCase()));
-  return missingTags.length ? `${source}\n\n${missingTags.join(" ")}` : source;
+  const tagPattern = /#[\p{L}\p{N}_]+/gu;
+  const seen = new Set();
+  const collected = [];
+
+  requiredTags.forEach((tag) => {
+    const key = tag.toLowerCase();
+    if (!seen.has(key)) {
+      seen.add(key);
+      collected.push(tag);
+    }
+  });
+
+  const bodyWithoutTags = source.replace(tagPattern, "").replace(/[ \t]+\n/g, "\n").replace(/\n{3,}/g, "\n\n").trim();
+  const existingTags = source.match(tagPattern) || [];
+  existingTags.forEach((tag) => {
+    const key = tag.toLowerCase();
+    if (!seen.has(key) && collected.length < maxTags) {
+      seen.add(key);
+      collected.push(tag);
+    }
+  });
+
+  return `${bodyWithoutTags}\n\n${collected.slice(0, maxTags).join(" ")}`.trim();
 }
 
 function readableError(errorText) {
@@ -351,18 +373,17 @@ async function generateTikTokCaptions() {
     }
 
     const parsed = extractJson(payload.content || "");
-    els.hypicCaptionOutput.value = ensureHashtags(parsed.hypic_caption, [
-      "#hypic",
-      "#hypiccreator",
-      "#hypicATETHAT",
-      "#Godpic",
-    ]);
-    els.capcutCaptionOutput.value = ensureHashtags(parsed.capcut_caption, ["#capcut", "#capcutpioneer"]);
-    els.capcutReactivationCaptionOutput.value = ensureHashtags(parsed.capcut_reactivation_caption, [
-      "#capcut",
-      "#capcutpioneer",
-      "#capcutnow",
-    ]);
+    els.hypicCaptionOutput.value = ensureHashtags(
+      parsed.hypic_caption,
+      ["#hypic", "#hypiccreator", "#hypicATETHAT", "#Godpic"],
+      5,
+    );
+    els.capcutCaptionOutput.value = ensureHashtags(parsed.capcut_caption, ["#capcut", "#capcutpioneer"], 5);
+    els.capcutReactivationCaptionOutput.value = ensureHashtags(
+      parsed.capcut_reactivation_caption,
+      ["#capcut", "#capcutpioneer", "#capcutnow"],
+      5,
+    );
     setStatus("文案完成", "ok");
   } catch (error) {
     setStatus("调用失败", "error");
