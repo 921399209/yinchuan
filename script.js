@@ -134,7 +134,7 @@ function buildCaptionInstruction() {
 - CapCut 拉失活文案要更直接地召回用户打开 CapCut，例如强调“现在就打开 CapCut”“这个模板别错过”“用旧照片也能做同款”。
 - hashtag 要少而准：Hypic 文案固定 4 个强制标签后最多再加 1 个；CapCut 文案固定 2 个强制标签后最多再加 3 个；CapCut 拉失活文案固定 3 个强制标签后最多再加 2 个。
 - 不要 Markdown，不要解释，不要分代码块。
-- 不要使用中文，除非文案语言选择中文。
+- 绝对不要输出中文汉字。当前文案语言选项不包含中文，所以 hypic_caption、capcut_caption、capcut_reactivation_caption 三个字段里都不能出现中文标题、中文解释、中文小节名或中文标签。
 - 不要编造真实姓名，图片里看不清身份时用通用称呼。
 - 图片提示词要具体到这张图的视觉元素，不能只写“生成同款图片”。
 
@@ -182,6 +182,15 @@ function ensureHashtags(text, requiredTags, maxTags = 5) {
   });
 
   return `${bodyWithoutTags}\n\n${collected.slice(0, maxTags).join(" ")}`.trim();
+}
+
+function stripChineseText(text) {
+  return String(text || "")
+    .replace(/[\u3400-\u9fff]+/g, "")
+    .replace(/[ \t]{2,}/g, " ")
+    .replace(/[ \t]+\n/g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
 }
 
 function readableError(errorText) {
@@ -374,13 +383,17 @@ async function generateTikTokCaptions() {
 
     const parsed = extractJson(payload.content || "");
     els.hypicCaptionOutput.value = ensureHashtags(
-      parsed.hypic_caption,
+      stripChineseText(parsed.hypic_caption),
       ["#hypic", "#hypiccreator", "#hypicATETHAT", "#Godpic"],
       5,
     );
-    els.capcutCaptionOutput.value = ensureHashtags(parsed.capcut_caption, ["#capcut", "#capcutpioneer"], 5);
+    els.capcutCaptionOutput.value = ensureHashtags(
+      stripChineseText(parsed.capcut_caption),
+      ["#capcut", "#capcutpioneer"],
+      5,
+    );
     els.capcutReactivationCaptionOutput.value = ensureHashtags(
-      parsed.capcut_reactivation_caption,
+      stripChineseText(parsed.capcut_reactivation_caption),
       ["#capcut", "#capcutpioneer", "#capcutnow"],
       5,
     );
@@ -474,9 +487,9 @@ els.copyAllButton.addEventListener("click", () => {
 els.copyCaptionsButton.addEventListener("click", () => {
   copyText(
     [
-      `Hypic 文案：\n${els.hypicCaptionOutput.value}`,
-      `CapCut 文案：\n${els.capcutCaptionOutput.value}`,
-      `CapCut 拉失活文案：\n${els.capcutReactivationCaptionOutput.value}`,
+      `Hypic Caption:\n${els.hypicCaptionOutput.value}`,
+      `CapCut Caption:\n${els.capcutCaptionOutput.value}`,
+      `CapCut Reactivation Caption:\n${els.capcutReactivationCaptionOutput.value}`,
     ].join("\n\n"),
     els.copyCaptionsButton,
     "复制文案",
