@@ -399,6 +399,22 @@ textarea {
   background: #fff;
 }
 
+.copy-section-title {
+  margin-top: 8px;
+}
+
+.caption-output-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.caption-wide-card {
+  grid-column: 1 / -1;
+}
+
+.caption-output-grid textarea {
+  min-height: 360px;
+}
+
 #analysisCanvas {
   display: none;
 }

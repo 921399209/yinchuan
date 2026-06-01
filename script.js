@@ -16,16 +16,23 @@ const els = {
   modelSuggestions: document.querySelector("#modelSuggestions"),
   checkModelsButton: document.querySelector("#checkModelsButton"),
   generateButton: document.querySelector("#generateButton"),
+  generateCopyButton: document.querySelector("#generateCopyButton"),
   apiHint: document.querySelector("#apiHint"),
   chatgptCnOutput: document.querySelector("#chatgptCnOutput"),
   chatgptEnOutput: document.querySelector("#chatgptEnOutput"),
   hypicCnOutput: document.querySelector("#hypicCnOutput"),
   hypicEnOutput: document.querySelector("#hypicEnOutput"),
+  hypicCaptionOutput: document.querySelector("#hypicCaptionOutput"),
+  capcutCaptionOutput: document.querySelector("#capcutCaptionOutput"),
+  capcutReactivationCaptionOutput: document.querySelector("#capcutReactivationCaptionOutput"),
   copyAllButton: document.querySelector("#copyAllButton"),
+  copyCaptionsButton: document.querySelector("#copyCaptionsButton"),
   subjectInput: document.querySelector("#subjectInput"),
   goalSelect: document.querySelector("#goalSelect"),
   sceneSelect: document.querySelector("#sceneSelect"),
   focusSelect: document.querySelector("#focusSelect"),
+  copyLanguageInput: document.querySelector("#copyLanguageInput"),
+  copyTypeSelect: document.querySelector("#copyTypeSelect"),
 };
 
 let serverKeyConfigured = false;
@@ -92,6 +99,48 @@ generate a dramatic photo realistic scene of this guy in stylish jeans and green
   "hypic_en": "shorter Hypic English prompt close to the original style"
 }`;
 }
+
+function buildCaptionInstruction() {
+  const language = els.copyLanguageInput.value.trim() || "印尼语";
+  const type = els.copyTypeSelect.value;
+  const subject = els.subjectInput.value.trim() || "按图片主体判断";
+
+  return `你是一个 TikTok 短视频文案生成器。请根据用户上传的图片，生成适合 TikTok 发布的长文案。文案语言必须是：${language}。
+
+用户补充：
+- 图片主体：${subject}
+- 文案类型：${type === "all" ? "全部生成" : type}
+
+文案必须模仿这种结构：
+1. 开头一句强钩子：类似“我教你怎么用 AI 做这个 trend，很简单”，要贴合图片效果。
+2. 一大段用户搜索关键词堆叠：包含教程词、trend 词、AI 词、ChatGPT/Gemini/CapCut/Hypic 词、图片风格词、用户可能搜索的长尾词。
+3. 一段自然文案：解释这个图片效果、画面风格、适合什么人、为什么容易火。
+4. 一段“图片提示词”：告诉用户把自己的照片发给 ChatGPT/Gemini/Hypic/CapCut 后如何生成同款，必须根据图片内容写具体效果。
+5. 一组相关词语：和图片内容、人物、场景、风格、教程、AI 生成有关。
+6. 结尾 hashtags：必须包含指定强制话题，同时补充和图片相关的话题。
+
+分类规则：
+- hypic_caption 是 Hypic 文案，必须包含这些话题且不能漏：#hypic #hypiccreator #hypicATETHAT #Godpic
+- capcut_caption 是 CapCut 文案，必须包含这些话题且不能漏：#capcut #capcutpioneer
+- capcut_reactivation_caption 是 CapCut 拉失活文案，必须包含这些话题且不能漏：#capcut #capcutpioneer #capcutnow，并且语气要更像召回老用户/让用户重新打开 CapCut 做同款，例如“还没试过这个模板就亏了”“现在打开 CapCut 做同款”。
+
+写作要求：
+- 如果文案类型是全部生成，就三个字段都输出完整文案。
+- 如果只选择某一种类型，仍然输出 JSON 三个字段，但未选择的字段填空字符串。
+- 每个文案必须是可直接复制到 TikTok 的完整发布文案。
+- 不要 Markdown，不要解释，不要分代码块。
+- 不要使用中文，除非文案语言选择中文。
+- 不要编造真实姓名，图片里看不清身份时用通用称呼。
+- 图片提示词要具体到这张图的视觉元素，不能只写“生成同款图片”。
+
+输出必须是 JSON：
+{
+  "hypic_caption": "Hypic 完整文案",
+  "capcut_caption": "CapCut 完整文案",
+  "capcut_reactivation_caption": "CapCut 拉失活完整文案"
+}`;
+}
+
 function extractJson(text) {
   try {
     return JSON.parse(text);
@@ -100,6 +149,13 @@ function extractJson(text) {
     if (!match) throw new Error("接口返回不是可解析的 JSON");
     return JSON.parse(match[0]);
   }
+}
+
+function ensureHashtags(text, requiredTags) {
+  const source = String(text || "").trim();
+  if (!source) return "";
+  const missingTags = requiredTags.filter((tag) => !source.toLowerCase().includes(tag.toLowerCase()));
+  return missingTags.length ? `${source}\n\n${missingTags.join(" ")}` : source;
 }
 
 function readableError(errorText) {
@@ -246,6 +302,75 @@ async function callThirdPartyApi() {
   }
 }
 
+async function generateTikTokCaptions() {
+  const apiKey = els.apiKeyInput.value.trim();
+  const model = els.modelInput.value.trim();
+
+  if (!apiKey && !serverKeyConfigured) {
+    setStatus("缺少 API Key", "error");
+    els.apiKeyInput.focus();
+    return;
+  }
+
+  if (!model) {
+    setStatus("缺少模型名", "error");
+    els.modelInput.focus();
+    return;
+  }
+
+  if (!state.imageDataUrl) {
+    setStatus("请先上传图片", "error");
+    return;
+  }
+
+  if (apiKey) localStorage.setItem("cccjin_api_key", apiKey);
+  localStorage.setItem("cccjin_model", model);
+  setStatus("生成文案中", "loading");
+  els.generateCopyButton.disabled = true;
+  els.generateCopyButton.textContent = "正在生成文案...";
+
+  try {
+    const response = await fetch("/api/analyze-image", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        apiKey,
+        model,
+        image: state.imageDataUrl,
+        prompt: buildCaptionInstruction(),
+      }),
+    });
+
+    const payload = await response.json();
+    if (!response.ok) {
+      throw new Error(readableError(payload.error || `接口调用失败：${response.status}`));
+    }
+
+    const parsed = extractJson(payload.content || "");
+    els.hypicCaptionOutput.value = ensureHashtags(parsed.hypic_caption, [
+      "#hypic",
+      "#hypiccreator",
+      "#hypicATETHAT",
+      "#Godpic",
+    ]);
+    els.capcutCaptionOutput.value = ensureHashtags(parsed.capcut_caption, ["#capcut", "#capcutpioneer"]);
+    els.capcutReactivationCaptionOutput.value = ensureHashtags(parsed.capcut_reactivation_caption, [
+      "#capcut",
+      "#capcutpioneer",
+      "#capcutnow",
+    ]);
+    setStatus("文案完成", "ok");
+  } catch (error) {
+    setStatus("调用失败", "error");
+    els.hypicCaptionOutput.value = `调用失败：${readableError(error.message)}`;
+    els.capcutCaptionOutput.value = "";
+    els.capcutReactivationCaptionOutput.value = "";
+  } finally {
+    els.generateCopyButton.disabled = false;
+    els.generateCopyButton.textContent = "生成 TikTok 文案";
+  }
+}
+
 function loadFile(file) {
   if (!file || !file.type.startsWith("image/")) return;
   const reader = new FileReader();
@@ -299,6 +424,7 @@ document.addEventListener("paste", (event) => {
 });
 
 els.generateButton.addEventListener("click", callThirdPartyApi);
+els.generateCopyButton.addEventListener("click", generateTikTokCaptions);
 els.checkModelsButton.addEventListener("click", checkModels);
 els.modelSelect.addEventListener("change", () => {
   if (els.modelSelect.value) {
@@ -320,11 +446,26 @@ els.copyAllButton.addEventListener("click", () => {
   );
 });
 
+els.copyCaptionsButton.addEventListener("click", () => {
+  copyText(
+    [
+      `Hypic 文案：\n${els.hypicCaptionOutput.value}`,
+      `CapCut 文案：\n${els.capcutCaptionOutput.value}`,
+      `CapCut 拉失活文案：\n${els.capcutReactivationCaptionOutput.value}`,
+    ].join("\n\n"),
+    els.copyCaptionsButton,
+    "复制文案",
+  );
+});
+
 const outputMap = {
   chatgptCn: els.chatgptCnOutput,
   chatgptEn: els.chatgptEnOutput,
   hypicCn: els.hypicCnOutput,
   hypicEn: els.hypicEnOutput,
+  hypicCaption: els.hypicCaptionOutput,
+  capcutCaption: els.capcutCaptionOutput,
+  capcutReactivationCaption: els.capcutReactivationCaptionOutput,
 };
 
 document.querySelectorAll(".copy-one").forEach((button) => {

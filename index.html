@@ -53,6 +53,7 @@
             </label>
             <button class="secondary-button wide-button" id="checkModelsButton" type="button">检测可用模型</button>
             <button class="ghost-button wide-button" id="generateButton" type="button">生成同款模板</button>
+            <button class="secondary-button wide-button" id="generateCopyButton" type="button">生成 TikTok 文案</button>
             <p class="hint" id="apiHint">站点会调用第三方视觉模型提取模板，不使用本地识别。</p>
           </div>
         </aside>
@@ -67,6 +68,19 @@
           </div>
 
           <div class="controls">
+            <label>
+              文案语言
+              <input id="copyLanguageInput" type="text" value="印尼语" placeholder="例如：印尼语、西班牙语、英语、中文" />
+            </label>
+            <label>
+              文案类型
+              <select id="copyTypeSelect">
+                <option value="all">全部生成</option>
+                <option value="hypic">Hypic 文案</option>
+                <option value="capcut">CapCut 文案</option>
+                <option value="capcut_reactivation">CapCut 拉失活文案</option>
+              </select>
+            </label>
             <label>
               你的照片主体
               <input id="subjectInput" type="text" placeholder="例如：我上传的人像照片、我的半身照、我的产品照片" />
@@ -131,6 +145,37 @@
                 <button class="text-button copy-one" data-copy="hypicEn" type="button">复制</button>
               </div>
               <textarea id="hypicEnOutput" spellcheck="false" placeholder="Use this with your own uploaded photo in Hypic"></textarea>
+            </section>
+          </div>
+
+          <div class="section-title copy-section-title">
+            <span>TikTok 文案分类</span>
+            <button class="text-button" id="copyCaptionsButton" type="button">复制文案</button>
+          </div>
+
+          <div class="output-grid caption-output-grid">
+            <section class="prompt-card">
+              <div class="section-title">
+                <span>Hypic 文案</span>
+                <button class="text-button copy-one" data-copy="hypicCaption" type="button">复制</button>
+              </div>
+              <textarea id="hypicCaptionOutput" spellcheck="false" placeholder="必须包含 #hypic #hypiccreator #hypicATETHAT #Godpic"></textarea>
+            </section>
+
+            <section class="prompt-card">
+              <div class="section-title">
+                <span>CapCut 文案</span>
+                <button class="text-button copy-one" data-copy="capcutCaption" type="button">复制</button>
+              </div>
+              <textarea id="capcutCaptionOutput" spellcheck="false" placeholder="必须包含 #capcut #capcutpioneer"></textarea>
+            </section>
+
+            <section class="prompt-card caption-wide-card">
+              <div class="section-title">
+                <span>CapCut 拉失活文案</span>
+                <button class="text-button copy-one" data-copy="capcutReactivationCaption" type="button">复制</button>
+              </div>
+              <textarea id="capcutReactivationCaptionOutput" spellcheck="false" placeholder="必须包含 #capcut #capcutpioneer #capcutnow"></textarea>
             </section>
           </div>
         </section>
