@@ -20,8 +20,6 @@ const els = {
   apiHint: document.querySelector("#apiHint"),
   chatgptCnOutput: document.querySelector("#chatgptCnOutput"),
   chatgptEnOutput: document.querySelector("#chatgptEnOutput"),
-  hypicCnOutput: document.querySelector("#hypicCnOutput"),
-  hypicEnOutput: document.querySelector("#hypicEnOutput"),
   hypicCaptionOutput: document.querySelector("#hypicCaptionOutput"),
   capcutCaptionOutput: document.querySelector("#capcutCaptionOutput"),
   capcutReactivationCaptionOutput: document.querySelector("#capcutReactivationCaptionOutput"),
@@ -94,9 +92,7 @@ generate a dramatic photo realistic scene of this guy in stylish jeans and green
 输出必须是 JSON，不要 Markdown，不要代码块：
 {
   "chatgpt_cn": "接近原始 prompt 写法的中文同款提示词",
-  "chatgpt_en": "English prompt close to the original generation prompt style",
-  "hypic_cn": "更短的 Hypic 中文原始风格提示词",
-  "hypic_en": "shorter Hypic English prompt close to the original style"
+  "chatgpt_en": "English prompt close to the original generation prompt style"
 }`;
 }
 
@@ -341,15 +337,11 @@ async function callThirdPartyApi() {
     const parsed = extractJson(content);
     els.chatgptCnOutput.value = parsed.chatgpt_cn || parsed.chatgpt || "";
     els.chatgptEnOutput.value = parsed.chatgpt_en || "";
-    els.hypicCnOutput.value = parsed.hypic_cn || parsed.gemini_cn || parsed.gemini || "";
-    els.hypicEnOutput.value = parsed.hypic_en || parsed.gemini_en || "";
     setStatus("生成完成", "ok");
   } catch (error) {
     setStatus("调用失败", "error");
     els.chatgptCnOutput.value = `调用失败：${readableError(error.message)}`;
     els.chatgptEnOutput.value = "";
-    els.hypicCnOutput.value = "";
-    els.hypicEnOutput.value = "";
   } finally {
     els.generateButton.disabled = false;
     els.generateButton.textContent = "生成同款模板";
@@ -495,8 +487,6 @@ els.copyAllButton.addEventListener("click", () => {
     [
       `ChatGPT 中文模板：\n${els.chatgptCnOutput.value}`,
       `ChatGPT English Template:\n${els.chatgptEnOutput.value}`,
-      `Hypic 中文模板：\n${els.hypicCnOutput.value}`,
-      `Hypic English Template:\n${els.hypicEnOutput.value}`,
     ].join("\n\n"),
     els.copyAllButton,
     "复制全部",
@@ -518,8 +508,6 @@ els.copyCaptionsButton.addEventListener("click", () => {
 const outputMap = {
   chatgptCn: els.chatgptCnOutput,
   chatgptEn: els.chatgptEnOutput,
-  hypicCn: els.hypicCnOutput,
-  hypicEn: els.hypicEnOutput,
   hypicCaption: els.hypicCaptionOutput,
   capcutCaption: els.capcutCaptionOutput,
   capcutReactivationCaption: els.capcutReactivationCaptionOutput,
