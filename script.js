@@ -59,9 +59,9 @@ async function loadServerConfig() {
 }
 
 function buildInstruction() {
-  return `你是一个“同款效果提示词反推器”。用户上传的图片不是要被描述的普通图片，而是一张已经由“原图 + 生图提示词”生成出来的成品效果图。你的任务是反推出一段可复用的同款提示词：用户以后只需要上传自己的照片，再粘贴你输出的提示词，就能把自己的照片做成和参考效果图一样的视觉效果。
+  return `你是一个“原始生图提示词反推器”。用户上传的图片是一张由“自拍/原图 + 一段英文生图 prompt”生成出来的成品效果图。你的任务不是优化提示词，不是写摄影分析，而是尽量反推出接近原始 prompt 写法的短提示词，让用户以后只需要上传自己的照片，再粘贴你输出的提示词，就能生成同款效果。
 
-核心目标：输出必须像原始生图 prompt 一样短、直接、好用。提示词要以“我上传的照片中的人物/主体”为唯一主角，保留本人的五官、发型、肤色、脸型、身份一致性，然后把这个人放进参考图的同款场景、动作、构图、特效、光影、色调和氛围里。
+核心目标：反推“原始 prompt 的意图和句式”。输出要像用户真的会拿去生图的原句，短、直接、带一点不完美英文和关键词堆叠。不要改写成专业摄影说明，不要加入太多参考图没有明确要求的细节。
 
 用户补充：
 - 你的照片主体：${els.subjectInput.value.trim() || "我上传的人物照片"}
@@ -70,26 +70,26 @@ function buildInstruction() {
 - 保留重点：${els.focusSelect.value}
 
 生成规则：
-1. 输出的是“上传自己的照片 + 这段提示词即可做同款”的提示词，不是图片描述、不是画面分析、不是复述参考图。
-2. 每条提示词只写一段，不要分点，不要解释，不要写“参考图中/这张图/画面里可以看到”。
-3. 中文控制在 60-130 个汉字；英文控制在 45-95 个词，越接近原始 prompt 越好。
-4. 必须写清楚：使用我上传的照片作为人物/主体参考，保留真实脸部、发型、肤色、体型和身份一致。
-5. 必须把参考图最关键的同款效果提炼出来：人物动作、主体与场景关系、关键道具或背景、构图机位、破碎/烟雾/光效等特效、色调和电影感。
-6. 不能把参考图里的具体人物身份、性别、年龄、服装细节硬编码成固定内容，除非这是同款效果必需的造型元素；优先写“上传照片中的人物 / the person from my uploaded photo”。
-7. 如果有 logo、用户名、水印、文字，只写可替换结构，例如“社交媒体主页界面 / social profile interface”，不要复制真实平台名和真实文字。
-8. ChatGPT 版本要明确适合“上传一张本人照片后使用”；Hypic 版本要更短、更像关键词生图 prompt。
-9. 只输出能直接粘贴使用的提示词，禁止输出负面提示词、同款变体、解释说明。
+1. 输出的是“自己的照片 + 这段 prompt 即可做同款”的原始风格提示词，不是图片描述、不是分析、不是润色后的摄影脚本。
+2. 每条只写一段，不要分点，不要解释，不要写“参考图中/这张图/画面里可以看到”。
+3. 英文控制在 35-75 个词，中文控制在 45-110 个汉字；越接近原始 prompt 越好。
+4. 英文要尽量使用这种原始句式：generate a dramatic photo realistic scene of this guy/girl/person from the first image..., confidently walking out of..., the screen resembles..., shattered glass..., shards flying outward..., dynamic cinematic filter。
+5. 中文也要像直译的生图提示词，不要变成长篇专业描述。
+6. 必须保留参考图最显眼、最可能来自原 prompt 的词：主体服装/造型、动作、巨大手机屏幕、短视频/TikTok profile 或社交主页、用户名/profile 区域、玻璃碎裂、碎片飞出、动态电影感滤镜。
+7. 不要强行加入“low-angle、dust、smoke、dark gritty environment、high contrast、poster style”等泛化词，除非它们是画面核心且原 prompt 很可能会写。
+8. 人物替换方式：ChatGPT 版可以写“photo from the first image / 上传的第一张照片”；Hypic 版可以写“uploaded photo subject / 上传照片人物”。重点是让用户上传自己的照片后能套用。
+9. 如果画面有可识别平台样式，可以写 TikTok profile / 短视频主页；如果有真实用户名，不要复制具体用户名，写 with the username / 带用户名区域 即可。
+10. 禁止输出负面提示词、同款变体、解释说明。
 
-参考写法风格：
-中文：使用我上传的人物照片作为主角，保持本人五官和身份一致，让他/她……，同款……效果，……飞溅/环绕，电影感写实光影。
-英文：use the person from my uploaded photo as the main subject, keep the same face and identity, ... same-style ..., cinematic realistic lighting, dynamic ...
+强参考示例，遇到类似“人物走出巨大手机屏幕、TikTok 主页、玻璃碎裂”的图时，英文应该接近这种，而不是专业改写：
+generate a dramatic photo realistic scene of this guy in stylish jeans and green scarf clothes photo from the first image confidently walking out of a giant smartphone screen, the phone screen resembles a tiktok profile with the username, the glass of the phone is shattered with shards flying outward creating a dynamic cinematic filter
 
 输出必须是 JSON，不要 Markdown，不要代码块：
 {
-  "chatgpt_cn": "上传自己的照片后可直接使用的中文同款提示词",
-  "chatgpt_en": "English same-style prompt to use with the user's own uploaded photo",
-  "hypic_cn": "更短的 Hypic 中文同款提示词",
-  "hypic_en": "shorter Hypic English same-style prompt"
+  "chatgpt_cn": "接近原始 prompt 写法的中文同款提示词",
+  "chatgpt_en": "English prompt close to the original generation prompt style",
+  "hypic_cn": "更短的 Hypic 中文原始风格提示词",
+  "hypic_en": "shorter Hypic English prompt close to the original style"
 }`;
 }
 function extractJson(text) {
