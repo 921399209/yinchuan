@@ -59,9 +59,9 @@ async function loadServerConfig() {
 }
 
 function buildInstruction() {
-  return `你是一个“参考效果图转同款模板提示词”的生成器。用户上传的图片是一张由“原图 + 提示词”生成出来的效果图。你的任务不是普通描述图片，而是反推出一个可复用模板，让用户之后上传自己的真人照片或主体照片，也能生成同款效果。
+  return `你是一个“同款效果提示词反推器”。用户上传的图片不是要被描述的普通图片，而是一张已经由“原图 + 生图提示词”生成出来的成品效果图。你的任务是反推出一段可复用的同款提示词：用户以后只需要上传自己的照片，再粘贴你输出的提示词，就能把自己的照片做成和参考效果图一样的视觉效果。
 
-核心目标：输出的提示词必须能直接配合用户自己的照片使用。提示词里必须明确写：以我上传的人物照片/主体照片为主角，保持五官、发型、肤色、脸部特征、身份一致，只把这个人套进参考图的同款场景、动作、构图、特效、光影和风格里。
+核心目标：输出必须像原始生图 prompt 一样短、直接、好用。提示词要以“我上传的照片中的人物/主体”为唯一主角，保留本人的五官、发型、肤色、脸型、身份一致性，然后把这个人放进参考图的同款场景、动作、构图、特效、光影、色调和氛围里。
 
 用户补充：
 - 你的照片主体：${els.subjectInput.value.trim() || "我上传的人物照片"}
@@ -70,22 +70,26 @@ function buildInstruction() {
 - 保留重点：${els.focusSelect.value}
 
 生成规则：
-1. 输出的是“可复用同款模板”，不是对参考图的普通描述。
-2. 每条提示词只写一段，不要分点，不要解释。
-3. 中文控制在 120-220 个汉字；英文控制在 70-130 个词。
-4. 必须包含身份一致性指令：保留上传照片中人物的五官、发型、肤色、脸型和真实身份。
-5. 必须抽取参考图的同款结构：主体动作、场景设定、构图、镜头、光影、色调、材质、特效、氛围。
-6. 不要固定参考图中人物的具体身份，不要写死“这个男生/这个女生”，要写“上传照片中的人物 / the person from the uploaded photo”。
-7. 如果参考图有水印、用户名、平台 logo 或文字，不要要求复刻真实文字，只保留“社交媒体界面 / profile interface / graphic layout”等可替换结构。
-8. 风格要短、直接、效果导向，像原始生图 prompt，而不是长篇分析报告。
-9. ChatGPT 版本可以稍微更明确地告诉 ChatGPT 使用上传照片做身份参考；Hypic 版本要更像直接生图 prompt，短一点、更关键词化。
+1. 输出的是“上传自己的照片 + 这段提示词即可做同款”的提示词，不是图片描述、不是画面分析、不是复述参考图。
+2. 每条提示词只写一段，不要分点，不要解释，不要写“参考图中/这张图/画面里可以看到”。
+3. 中文控制在 60-130 个汉字；英文控制在 45-95 个词，越接近原始 prompt 越好。
+4. 必须写清楚：使用我上传的照片作为人物/主体参考，保留真实脸部、发型、肤色、体型和身份一致。
+5. 必须把参考图最关键的同款效果提炼出来：人物动作、主体与场景关系、关键道具或背景、构图机位、破碎/烟雾/光效等特效、色调和电影感。
+6. 不能把参考图里的具体人物身份、性别、年龄、服装细节硬编码成固定内容，除非这是同款效果必需的造型元素；优先写“上传照片中的人物 / the person from my uploaded photo”。
+7. 如果有 logo、用户名、水印、文字，只写可替换结构，例如“社交媒体主页界面 / social profile interface”，不要复制真实平台名和真实文字。
+8. ChatGPT 版本要明确适合“上传一张本人照片后使用”；Hypic 版本要更短、更像关键词生图 prompt。
+9. 只输出能直接粘贴使用的提示词，禁止输出负面提示词、同款变体、解释说明。
+
+参考写法风格：
+中文：使用我上传的人物照片作为主角，保持本人五官和身份一致，让他/她……，同款……效果，……飞溅/环绕，电影感写实光影。
+英文：use the person from my uploaded photo as the main subject, keep the same face and identity, ... same-style ..., cinematic realistic lighting, dynamic ...
 
 输出必须是 JSON，不要 Markdown，不要代码块：
 {
-  "chatgpt_cn": "用于 ChatGPT 的中文同款模板提示词",
-  "chatgpt_en": "English reusable template prompt for ChatGPT",
-  "hypic_cn": "用于 Hypic 的中文同款模板提示词",
-  "hypic_en": "English reusable template prompt for Hypic"
+  "chatgpt_cn": "上传自己的照片后可直接使用的中文同款提示词",
+  "chatgpt_en": "English same-style prompt to use with the user's own uploaded photo",
+  "hypic_cn": "更短的 Hypic 中文同款提示词",
+  "hypic_en": "shorter Hypic English same-style prompt"
 }`;
 }
 function extractJson(text) {

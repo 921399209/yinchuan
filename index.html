@@ -21,8 +21,8 @@
           <label class="drop-zone" id="dropZone" for="imageInput">
             <input id="imageInput" type="file" accept="image/*" />
             <span class="drop-icon">+</span>
-            <strong>上传效果参考图</strong>
-            <small>上传“原图 + 提示词”生成后的效果图，提取可套用到你本人照片的同款模板</small>
+            <strong>上传同款效果图</strong>
+            <small>反推出提示词：以后上传你自己的照片 + 这段提示词，就能做出同款效果</small>
           </label>
 
           <div class="preview-wrap" id="previewWrap">
@@ -61,7 +61,7 @@
           <div class="toolbar">
             <div>
               <p class="eyebrow">Reusable Template</p>
-              <h2>套用到自己的照片</h2>
+              <h2>自己的照片 + 提示词</h2>
             </div>
             <button class="ghost-button" id="copyAllButton" type="button">复制全部</button>
           </div>
@@ -106,7 +106,7 @@
                 <span>ChatGPT 中文模板</span>
                 <button class="text-button copy-one" data-copy="chatgptCn" type="button">复制</button>
               </div>
-              <textarea id="chatgptCnOutput" spellcheck="false" placeholder="上传效果图并点击“生成同款模板”"></textarea>
+              <textarea id="chatgptCnOutput" spellcheck="false" placeholder="生成后，把自己的照片和这段提示词一起发给 ChatGPT"></textarea>
             </section>
 
             <section class="prompt-card">
@@ -114,7 +114,7 @@
                 <span>ChatGPT English Template</span>
                 <button class="text-button copy-one" data-copy="chatgptEn" type="button">复制</button>
               </div>
-              <textarea id="chatgptEnOutput" spellcheck="false" placeholder="Upload a result image and generate a reusable template"></textarea>
+              <textarea id="chatgptEnOutput" spellcheck="false" placeholder="Use this with your own uploaded photo in ChatGPT"></textarea>
             </section>
 
             <section class="prompt-card">
@@ -122,7 +122,7 @@
                 <span>Hypic 中文模板</span>
                 <button class="text-button copy-one" data-copy="hypicCn" type="button">复制</button>
               </div>
-              <textarea id="hypicCnOutput" spellcheck="false" placeholder="上传效果图并点击“生成同款模板”"></textarea>
+              <textarea id="hypicCnOutput" spellcheck="false" placeholder="生成后，把自己的照片和这段提示词一起发给 Hypic"></textarea>
             </section>
 
             <section class="prompt-card">
@@ -130,7 +130,7 @@
                 <span>Hypic English Template</span>
                 <button class="text-button copy-one" data-copy="hypicEn" type="button">复制</button>
               </div>
-              <textarea id="hypicEnOutput" spellcheck="false" placeholder="Upload a result image and generate a reusable template"></textarea>
+              <textarea id="hypicEnOutput" spellcheck="false" placeholder="Use this with your own uploaded photo in Hypic"></textarea>
             </section>
           </div>
         </section>
