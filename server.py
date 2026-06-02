@@ -65,7 +65,7 @@ class Handler(SimpleHTTPRequestHandler):
             )
 
             with urllib.request.urlopen(request, timeout=120) as response:
-                payload = json.loads(response.read().decode("utf-8"))
+                payload = self._read_json_response(response)
 
             content = payload["choices"][0]["message"]["content"]
             self._json_response(200, {"content": content, "raw": payload})
@@ -87,7 +87,7 @@ class Handler(SimpleHTTPRequestHandler):
             )
 
             with urllib.request.urlopen(request, timeout=60) as response:
-                payload = json.loads(response.read().decode("utf-8"))
+                payload = self._read_json_response(response)
 
             models = []
             for item in payload.get("data", []):
@@ -115,6 +115,10 @@ class Handler(SimpleHTTPRequestHandler):
             return payload.get("error", {}).get("message") or payload.get("message") or detail
         except Exception:
             return detail
+
+    def _read_json_response(self, response):
+        detail = response.read().decode("utf-8", errors="replace")
+        return json.loads(detail)
 
     def _json_response(self, status, payload):
         body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
