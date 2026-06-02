@@ -20,6 +20,7 @@ const els = {
   chatgptCnOutput: document.querySelector("#chatgptCnOutput"),
   chatgptEnOutput: document.querySelector("#chatgptEnOutput"),
   negativePromptOutput: document.querySelector("#negativePromptOutput"),
+  suggestedParametersOutput: document.querySelector("#suggestedParametersOutput"),
   imagePromptInput: document.querySelector("#imagePromptInput"),
   generationImageInput: document.querySelector("#generationImageInput"),
   generationPreviewWrap: document.querySelector("#generationPreviewWrap"),
@@ -80,9 +81,16 @@ async function loadServerConfig() {
 }
 
 function buildInstruction() {
-  return `你是一个“原始生图提示词反推器”。用户上传的图片是一张由“自拍/原图 + 一段英文生图 prompt”生成出来的成品效果图。你的任务不是优化提示词，不是写摄影分析，而是尽量反推出接近原始 prompt 写法的短提示词，让用户以后只需要上传自己的照片，再粘贴你输出的提示词，就能生成同款效果。
+  return `Analyze the uploaded image as if you are reconstructing the original text-to-image prompt.
 
-核心目标：先在心里判断“这张效果图的原始 prompt 最可能是什么”，再输出接近原 prompt 的可复制句子。句式要像真实用户随手输入的生图 prompt，直接、短促、关键词堆叠、保留轻微语法不完整感；不要写成专业海报分析、商业摄影分镜或过度润色的长描述。
+Generate a highly detailed English prompt that could recreate an image extremely close to the reference.
+
+Focus on: subject, pose, facial expression, clothing, environment, composition, camera angle, lens, lighting, color palette, texture, material, artistic style, rendering style, mood, depth of field, background details, realism level, and image quality.
+
+Do not mention that you are looking at an image.
+Do not invent elements that are not visible.
+Use precise visual language.
+If the image looks AI-generated, infer the likely prompt style and parameters.
 
 用户补充：
 - 你的照片主体：${els.subjectInput.value.trim() || "我上传的人物照片"}
@@ -90,39 +98,25 @@ function buildInstruction() {
 - 替换策略：${els.sceneSelect.value}
 - 保留重点：${els.focusSelect.value}
 
-生成规则：
-1. 输出的是“自己的照片 + 这段 prompt 即可做同款”的原始风格提示词，不是图片描述、不是分析、不是润色后的摄影脚本。
-2. 每条只写一段，不要分点，不要解释，不要写“参考图中/这张图/画面里可以看到”。
-3. 英文通常控制在 45-120 个词，中文通常控制在 70-180 个汉字；如果主体以外的新增人物、牌匾文字、建筑、道具很多，允许更长一点，但仍然要像原 prompt，不要展开成摄影论文。
-4. 英文优先使用这种原始句式：generate a dramatic/realistic/photo realistic scene of this guy/girl/person from the first image..., add/generate..., standing beside him..., walking hand in hand..., in front of..., cinematic realistic filter。可以使用简单错词或直白短语，但必须准确还原核心效果。只有遇到手机破屏图时才使用 walking out of giant smartphone screen、TikTok profile、shattered glass 这一类句式。
-5. 中文也要像直译的生图提示词，不要变成长篇专业描述。
-6. “你的照片主体”是强控制条件，也是唯一可替换变量。只要用户在这个字段里确定了主体，例如“图片中的男性/女性/左边人物/中间人物/我的产品/我的宠物”，输出时就只能把这个主体写成 man/woman/person/product/pet from the first image / 上传照片里的主体；绝对不要描述这个可替换主体的脸、发型、肤色、年龄、身材、衣服、裤子、鞋子、配饰、文字 logo、颜色、材质等外观细节，因为用户会重新上传另一张主体照片，这些细节必须由新照片自己决定。
-7. 对可替换主体只保留动作、姿势、站位和互动关系，例如 walking, standing on the left, holding hands, looking at the woman, sitting, leaning, holding an object, walking beside her。主体的动作可以写，主体的外貌、穿搭、材质和旧照片特征不要写。
-8. 除了用户确定的主体以外，画面里的所有内容都要完整还原并写进 prompt：新增人物、女性/男性/儿童、宠物、道具、车辆、建筑、背景地标、灯光、天气、文字牌匾、树叶、地面、构图、滤镜、氛围等。非主体元素都要当作 AI 在 prompt 里新生成或固定复现的模板内容，不要写成第二张照片或原本合照。
-9. 对于被 AI 新增的人物，必须像锁定角色设定一样还原她/他在参考图里的所有关键细节：性别、年龄段、肤色、人种/地域气质、脸型气质、发型、头发颜色、身材比例、上衣、外套、裤子/裙子、鞋子、包包、配饰、姿势、站位、表情、视线、和主体的互动关系。尤其是情侣感画面，如果主体是男性，女性通常是 prompt 生成出来的角色，要写“generate/add a beautiful young Southeast Asian woman beside him”，并保留她的年轻东南亚女孩气质、浅暖肤色、甜美脸型、长酒红/樱桃红/burgundy red 波浪卷发、深红挑染层次、白色抹胸/短上衣、米色针织开衫、浅蓝刺绣宽松牛仔裤、白色鞋、斜挎包、微笑看向男性等细节。发色不要只写 red hair，要尽量写 burgundy/cherry red/dark crimson red wavy hair。
-10. 场景必须细写，尤其是参考图中后面的牌匾、招牌、门楼、柱子、可见文字、灯笼文字和背景层次。能看清文字时要尽量写出文字内容和样式；看不准时也要写出“large cream/gold Japanese/Chinese characters on a dark wooden plaque / 黑色木牌匾上的大号金色或奶白色汉字/日文字符”。如果有两个牌匾或多处文字，必须分别写：顶部横向黑色木牌匾、右侧竖向木牌匾、中央红色灯笼上的黑色大字。要描述牌匾在画面顶部、右侧竖牌、木质寺庙门框、两侧柱子、入口深处、台阶、长椅、树叶绿植、背景虚化游客、石板或浅色地面等可见元素。
-11. 必须保留参考图最显眼、最可能来自原 prompt 的词：主体动作、人物互动、场景、背景地标、牌匾文字、关键道具、屏幕/海报/车辆/灯笼等元素、AI 新增角色的造型细节、真实电影感滤镜。输出时把这些词放进同一段 prompt，不要拆成分析。不要描述可替换主体的旧照片穿搭，也不要忽略主体以外的任何重要细节。
-12. 不要强行加入“low-angle、dust、smoke、dark gritty environment、high contrast、poster style”等泛化词，除非它们是画面核心且原 prompt 很可能会写。
-13. 人物替换方式：ChatGPT 版可以写“photo from the first image / 上传的第一张照片”；Hypic 版可以写“uploaded photo subject / 上传照片人物”。重点是让用户上传自己的照片后能套用。
-14. 如果画面有可识别平台样式，可以写 TikTok profile / 短视频主页；如果有真实用户名，不要复制具体用户名，写 with the username / 带用户名区域 即可。
-15. 必须输出负面提示词 negative_prompt。负面提示词要简短实用，覆盖：low quality, blurry, deformed face, wrong identity, changed subject clothes when subject should come from uploaded photo, extra people, extra hands, bad hands, missing fingers, distorted body, unreadable or wrong text on signs, watermark, logo, overexposed, oversaturated, cartoon, anime, plastic skin, messy background。可以根据图片加入专属负面项，例如不要错发色、不要错牌匾文字、不要把 AI 新增女性变成上传照片人物。
-16. 禁止输出同款变体、解释说明、Markdown。
-
-强参考示例，遇到类似“人物走出巨大手机屏幕、TikTok 主页、玻璃碎裂”的图时，英文应该接近这种，而不是专业改写：
-generate a dramatic photo realistic scene of this guy in stylish jeans and green scarf clothes photo from the first image confidently walking out of a giant smartphone screen, the phone screen resembles a tiktok profile with the username, the glass of the phone is shattered with shards flying outward creating a dynamic cinematic filter
-
-强参考示例，遇到类似“上传男性照片 + AI 生成女性站在旁边”的情侣旅行图时，不要写成情侣合照，要接近这种：
-generate a realistic photo of the man from the first image walking hand in hand with a beautiful young Southeast Asian woman beside him, standing on the left and looking at her, the woman has warm light skin, sweet face, long wavy burgundy cherry red hair with darker crimson layers and bangs, slim body, smiling and looking at the man, wearing a white cropped tube top, beige knitted cardigan, light blue wide jeans with subtle floral embroidery, white shoes and a brown crossbody bag, couple travel style in front of an old Japanese temple wooden gate, top black wooden plaque with large gold Japanese characters, right vertical wooden sign with white characters like 浅草寺, huge red lantern behind them with bold black kanji, green leaves above, stone path, wooden pillars, soft blurred tourists and temple stairs in the background, natural daylight, romantic cinematic realistic filter
-
-如果用户确定“图片中的男性”为主体，错误写法是描述男性的卷发、肤色、白色 T 恤、黑色工装裤、球鞋；正确写法是只写 man from the first image walking hand in hand, standing on the left, looking at the woman，然后完整写女性和寺庙场景的细节。
-
-如果图里有牌匾、灯笼或可见文字，输出不能只写 temple gate / street background，必须写出每一处文字元素的位置、底色、字的颜色、字的大致内容或“large Japanese characters”。例如：顶部黑底金字横牌、右侧木牌白色竖字“浅草寺”、中央红色大灯笼黑色大字，以及周围木柱、门框、树叶、台阶、地面和背景人物。
+Additional reconstruction rules:
+1. Output English only.
+2. The Main Prompt must be a single highly detailed prompt, not an explanation. It may be long if needed for accuracy.
+3. Preserve visible details aggressively: subject, pose, expression, clothing, environment, composition, camera angle, lens feeling, lighting, color palette, textures, material, style, rendering, mood, depth of field, background details, realism, and image quality.
+4. If the user defines a replaceable subject in “你的照片主体”, describe that subject as the uploaded/photo subject and keep only pose, position, action, and interaction. Do not lock that replaceable subject's old face, hair, skin tone, clothing, shoes, accessories, logos, or material, because the user will upload a new subject photo.
+5. Everything outside the replaceable subject must be locked in detail. If there is an AI-generated companion/person, describe their age range, ethnicity or regional look, skin tone, facial vibe, hair color, hairstyle, body type, outfit, shoes, bag, accessories, expression, pose, position, gaze, and interaction.
+6. If visible text, plaques, lanterns, signs, usernames, screens, posters, storefronts, or interface elements appear, describe their position, color, material, typography style, and readable or approximate text. Do not omit sign text.
+7. If the image has a raw viral prompt style, infer that style but keep the final Main Prompt precise and usable.
+8. Negative Prompt must be practical and image-specific.
+9. Suggested Model / Style should name suitable model families or generation modes, for example GPT image generation, Midjourney realistic/editorial, Flux photoreal, cinematic composite, fashion editorial, or product render, based on the image.
+10. Suggested Parameters should include useful settings such as aspect ratio, lens/camera feel, quality/detail, stylize/style strength, CFG, steps, seed consistency, and any image-reference strength guidance. Use generic parameters when platform-specific settings are uncertain.
+11. Return JSON only. No Markdown, no numbered list text, no code block.
 
 输出必须是 JSON，不要 Markdown，不要代码块：
 {
-  "chatgpt_cn": "接近原始 prompt 写法的中文同款提示词",
-  "chatgpt_en": "English prompt close to the original generation prompt style",
-  "negative_prompt": "negative prompt in English, short and practical"
+  "main_prompt": "Main Prompt",
+  "negative_prompt": "Negative Prompt",
+  "suggested_model_style": "Suggested Model / Style",
+  "suggested_parameters": "Suggested Parameters"
 }`;
 }
 
@@ -323,15 +317,17 @@ async function callThirdPartyApi() {
 
     const content = payload.content || "";
     const parsed = extractJson(content);
-    els.chatgptCnOutput.value = parsed.chatgpt_cn || parsed.chatgpt || "";
-    els.chatgptEnOutput.value = parsed.chatgpt_en || "";
+    els.chatgptEnOutput.value = parsed.main_prompt || parsed.chatgpt_en || "";
+    els.chatgptCnOutput.value = parsed.suggested_model_style || parsed.chatgpt_cn || parsed.chatgpt || "";
     els.negativePromptOutput.value = parsed.negative_prompt || "";
+    els.suggestedParametersOutput.value = parsed.suggested_parameters || "";
     setStatus("生成完成", "ok");
   } catch (error) {
     setStatus("调用失败", "error");
-    els.chatgptCnOutput.value = `调用失败：${readableError(error.message)}`;
-    els.chatgptEnOutput.value = "";
+    els.chatgptEnOutput.value = `调用失败：${readableError(error.message)}`;
+    els.chatgptCnOutput.value = "";
     els.negativePromptOutput.value = "";
+    els.suggestedParametersOutput.value = "";
   } finally {
     els.generateButton.disabled = false;
     els.generateButton.textContent = "生成同款模板";
@@ -555,9 +551,10 @@ els.generateImageButton.addEventListener("click", generateImageWithGptImage2);
 els.copyAllButton.addEventListener("click", () => {
   copyText(
     [
-      `ChatGPT 中文模板：\n${els.chatgptCnOutput.value}`,
-      `ChatGPT English Template:\n${els.chatgptEnOutput.value}`,
+      `Main Prompt:\n${els.chatgptEnOutput.value}`,
       `Negative Prompt:\n${els.negativePromptOutput.value}`,
+      `Suggested Model / Style:\n${els.chatgptCnOutput.value}`,
+      `Suggested Parameters:\n${els.suggestedParametersOutput.value}`,
     ].join("\n\n"),
     els.copyAllButton,
     "复制全部",
@@ -580,6 +577,7 @@ const outputMap = {
   chatgptCn: els.chatgptCnOutput,
   chatgptEn: els.chatgptEnOutput,
   negativePrompt: els.negativePromptOutput,
+  suggestedParameters: els.suggestedParametersOutput,
   hypicCaption: els.hypicCaptionOutput,
   capcutCaption: els.capcutCaptionOutput,
   capcutReactivationCaption: els.capcutReactivationCaptionOutput,

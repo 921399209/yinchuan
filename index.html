@@ -125,18 +125,18 @@
           <div class="output-grid prompt-output-grid">
             <section class="prompt-card">
               <div class="section-title">
-                <span>ChatGPT 中文模板</span>
-                <button class="text-button copy-one" data-copy="chatgptCn" type="button">复制</button>
+                <span>Main Prompt</span>
+                <button class="text-button copy-one" data-copy="chatgptEn" type="button">复制</button>
               </div>
-              <textarea id="chatgptCnOutput" spellcheck="false" placeholder="生成后，把自己的照片和这段提示词一起发给 ChatGPT"></textarea>
+              <textarea id="chatgptEnOutput" spellcheck="false" placeholder="Highly detailed English prompt for recreating the reference style"></textarea>
             </section>
 
             <section class="prompt-card">
               <div class="section-title">
-                <span>ChatGPT English Template</span>
-                <button class="text-button copy-one" data-copy="chatgptEn" type="button">复制</button>
+                <span>Suggested Model / Style</span>
+                <button class="text-button copy-one" data-copy="chatgptCn" type="button">复制</button>
               </div>
-              <textarea id="chatgptEnOutput" spellcheck="false" placeholder="Use this with your own uploaded photo in ChatGPT"></textarea>
+              <textarea id="chatgptCnOutput" spellcheck="false" placeholder="Recommended model family, rendering style, realism level, and visual style"></textarea>
             </section>
 
             <section class="prompt-card">
@@ -146,12 +146,20 @@
               </div>
               <textarea id="negativePromptOutput" spellcheck="false" placeholder="生成后复制到 Negative prompt / 负面提示词区域"></textarea>
             </section>
+
+            <section class="prompt-card">
+              <div class="section-title">
+                <span>Suggested Parameters</span>
+                <button class="text-button copy-one" data-copy="suggestedParameters" type="button">复制</button>
+              </div>
+              <textarea id="suggestedParametersOutput" spellcheck="false" placeholder="Aspect ratio, quality, style strength, CFG, steps, seed notes, and other useful parameters"></textarea>
+            </section>
           </div>
 
           <section class="image-generator-panel">
             <div class="section-title">
               <span>gpt-image-2 直接生图</span>
-              <button class="text-button" id="useEnglishPromptButton" type="button">使用英文模板</button>
+              <button class="text-button" id="useEnglishPromptButton" type="button">使用 Main Prompt</button>
             </div>
             <label class="mini-upload">
               上传自己的主体图
