@@ -31,6 +31,8 @@ const els = {
 };
 
 let serverKeyConfigured = false;
+const FIXED_MODEL = "gpt-5.5";
+const FIXED_MODEL_LABEL = "GPT-5.5";
 
 function setStatus(text, tone = "idle") {
   els.apiStatus.textContent = text;
@@ -42,7 +44,7 @@ async function loadServerConfig() {
     const response = await fetch("/api/config");
     const config = await response.json();
     serverKeyConfigured = Boolean(config.serverKeyConfigured);
-    els.modelInput.value = "GPT-5.5";
+    els.modelInput.value = FIXED_MODEL;
     if (serverKeyConfigured) {
       els.apiKeyInput.value = "";
       els.apiKeyInput.placeholder = "已由站点服务器配置";
@@ -50,7 +52,7 @@ async function loadServerConfig() {
       els.apiKeyField.classList.add("hidden-field");
       els.apiKeyField.hidden = true;
       els.apiKeyField.style.display = "none";
-      els.apiHint.textContent = "站点已配置统一 API Key，固定使用 GPT-5.5。上传图片后直接生成即可。";
+      els.apiHint.textContent = `站点已配置统一 API Key，固定使用 ${FIXED_MODEL_LABEL}。上传图片后直接生成即可。`;
       setStatus("站点已配置", "ok");
     }
   } catch {
@@ -211,7 +213,7 @@ function readableError(errorText) {
   } catch {}
 
   if (/Service temporarily unavailable/i.test(text)) {
-    return "GPT-5.5 或上游通道临时不可用，请稍后重试。";
+    return `${FIXED_MODEL_LABEL} 或上游通道临时不可用，请稍后重试。`;
   }
   if (/Unauthorized|invalid api key|401/i.test(text)) {
     return "API Key 无效或没有权限，请检查 apis.cccjin.cn 后台生成的 Key。";
@@ -227,7 +229,7 @@ function readableError(errorText) {
 
 async function callThirdPartyApi() {
   const apiKey = els.apiKeyInput.value.trim();
-  const model = "GPT-5.5";
+  const model = FIXED_MODEL;
 
   if (!apiKey && !serverKeyConfigured) {
     setStatus("缺少 API Key", "error");
@@ -241,7 +243,7 @@ async function callThirdPartyApi() {
   }
 
   if (apiKey) localStorage.setItem("cccjin_api_key", apiKey);
-  localStorage.setItem("cccjin_model", "GPT-5.5");
+  localStorage.setItem("cccjin_model", FIXED_MODEL);
   setStatus("调用中", "loading");
   els.generateButton.disabled = true;
   els.generateButton.textContent = "正在调用接口...";
@@ -280,7 +282,7 @@ async function callThirdPartyApi() {
 
 async function generateTikTokCaptions() {
   const apiKey = els.apiKeyInput.value.trim();
-  const model = "GPT-5.5";
+  const model = FIXED_MODEL;
 
   if (!apiKey && !serverKeyConfigured) {
     setStatus("缺少 API Key", "error");
@@ -294,7 +296,7 @@ async function generateTikTokCaptions() {
   }
 
   if (apiKey) localStorage.setItem("cccjin_api_key", apiKey);
-  localStorage.setItem("cccjin_model", "GPT-5.5");
+  localStorage.setItem("cccjin_model", FIXED_MODEL);
   setStatus("生成文案中", "loading");
   els.generateCopyButton.disabled = true;
   els.generateCopyButton.textContent = "正在生成文案...";
@@ -366,7 +368,7 @@ async function copyText(text, button, label) {
 }
 
 els.apiKeyInput.value = localStorage.getItem("cccjin_api_key") || "";
-els.modelInput.value = "GPT-5.5";
+els.modelInput.value = FIXED_MODEL;
 loadServerConfig();
 
 els.input.addEventListener("change", (event) => {
