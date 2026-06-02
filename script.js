@@ -19,6 +19,7 @@ const els = {
   apiHint: document.querySelector("#apiHint"),
   chatgptCnOutput: document.querySelector("#chatgptCnOutput"),
   chatgptEnOutput: document.querySelector("#chatgptEnOutput"),
+  negativePromptOutput: document.querySelector("#negativePromptOutput"),
   imagePromptInput: document.querySelector("#imagePromptInput"),
   generationImageInput: document.querySelector("#generationImageInput"),
   generationPreviewWrap: document.querySelector("#generationPreviewWrap"),
@@ -81,7 +82,7 @@ async function loadServerConfig() {
 function buildInstruction() {
   return `你是一个“原始生图提示词反推器”。用户上传的图片是一张由“自拍/原图 + 一段英文生图 prompt”生成出来的成品效果图。你的任务不是优化提示词，不是写摄影分析，而是尽量反推出接近原始 prompt 写法的短提示词，让用户以后只需要上传自己的照片，再粘贴你输出的提示词，就能生成同款效果。
 
-核心目标：反推“原始 prompt 的意图和句式”。输出要像用户真的会拿去生图的原句，直接、可复制、带一点关键词堆叠。可以比普通短 prompt 更长一点，用来还原主体以外的场景、文字、道具和新增人物细节；但不要改写成空泛的摄影分析。
+核心目标：先在心里判断“这张效果图的原始 prompt 最可能是什么”，再输出接近原 prompt 的可复制句子。句式要像真实用户随手输入的生图 prompt，直接、短促、关键词堆叠、保留轻微语法不完整感；不要写成专业海报分析、商业摄影分镜或过度润色的长描述。
 
 用户补充：
 - 你的照片主体：${els.subjectInput.value.trim() || "我上传的人物照片"}
@@ -92,19 +93,20 @@ function buildInstruction() {
 生成规则：
 1. 输出的是“自己的照片 + 这段 prompt 即可做同款”的原始风格提示词，不是图片描述、不是分析、不是润色后的摄影脚本。
 2. 每条只写一段，不要分点，不要解释，不要写“参考图中/这张图/画面里可以看到”。
-3. 英文通常控制在 70-150 个词，中文通常控制在 90-220 个汉字；如果主体以外的场景、牌匾、文字、建筑、道具、新增人物很多，允许更长一点。宁可稍长也要还原细节，但仍然只输出一段可直接生图的 prompt。
-4. 英文要尽量使用这种原始句式：generate a realistic/photo realistic scene of this guy/girl/person from the first image..., add/generate..., standing beside him..., walking hand in hand..., in front of..., cinematic realistic filter。只有遇到手机破屏图时才使用 walking out of giant smartphone screen、TikTok profile、shattered glass 这一类句式。
+3. 英文通常控制在 45-120 个词，中文通常控制在 70-180 个汉字；如果主体以外的新增人物、牌匾文字、建筑、道具很多，允许更长一点，但仍然要像原 prompt，不要展开成摄影论文。
+4. 英文优先使用这种原始句式：generate a dramatic/realistic/photo realistic scene of this guy/girl/person from the first image..., add/generate..., standing beside him..., walking hand in hand..., in front of..., cinematic realistic filter。可以使用简单错词或直白短语，但必须准确还原核心效果。只有遇到手机破屏图时才使用 walking out of giant smartphone screen、TikTok profile、shattered glass 这一类句式。
 5. 中文也要像直译的生图提示词，不要变成长篇专业描述。
 6. “你的照片主体”是强控制条件，也是唯一可替换变量。只要用户在这个字段里确定了主体，例如“图片中的男性/女性/左边人物/中间人物/我的产品/我的宠物”，输出时就只能把这个主体写成 man/woman/person/product/pet from the first image / 上传照片里的主体；绝对不要描述这个可替换主体的脸、发型、肤色、年龄、身材、衣服、裤子、鞋子、配饰、文字 logo、颜色、材质等外观细节，因为用户会重新上传另一张主体照片，这些细节必须由新照片自己决定。
 7. 对可替换主体只保留动作、姿势、站位和互动关系，例如 walking, standing on the left, holding hands, looking at the woman, sitting, leaning, holding an object, walking beside her。主体的动作可以写，主体的外貌、穿搭、材质和旧照片特征不要写。
 8. 除了用户确定的主体以外，画面里的所有内容都要完整还原并写进 prompt：新增人物、女性/男性/儿童、宠物、道具、车辆、建筑、背景地标、灯光、天气、文字牌匾、树叶、地面、构图、滤镜、氛围等。非主体元素都要当作 AI 在 prompt 里新生成或固定复现的模板内容，不要写成第二张照片或原本合照。
 9. 对于被 AI 新增的人物，必须像锁定角色设定一样还原她/他在参考图里的所有关键细节：性别、年龄段、肤色、人种/地域气质、脸型气质、发型、头发颜色、身材比例、上衣、外套、裤子/裙子、鞋子、包包、配饰、姿势、站位、表情、视线、和主体的互动关系。尤其是情侣感画面，如果主体是男性，女性通常是 prompt 生成出来的角色，要写“generate/add a beautiful young Southeast Asian woman beside him”，并保留她的年轻东南亚女孩气质、浅暖肤色、甜美脸型、长酒红/樱桃红/burgundy red 波浪卷发、深红挑染层次、白色抹胸/短上衣、米色针织开衫、浅蓝刺绣宽松牛仔裤、白色鞋、斜挎包、微笑看向男性等细节。发色不要只写 red hair，要尽量写 burgundy/cherry red/dark crimson red wavy hair。
 10. 场景必须细写，尤其是参考图中后面的牌匾、招牌、门楼、柱子、可见文字、灯笼文字和背景层次。能看清文字时要尽量写出文字内容和样式；看不准时也要写出“large cream/gold Japanese/Chinese characters on a dark wooden plaque / 黑色木牌匾上的大号金色或奶白色汉字/日文字符”。如果有两个牌匾或多处文字，必须分别写：顶部横向黑色木牌匾、右侧竖向木牌匾、中央红色灯笼上的黑色大字。要描述牌匾在画面顶部、右侧竖牌、木质寺庙门框、两侧柱子、入口深处、台阶、长椅、树叶绿植、背景虚化游客、石板或浅色地面等可见元素。
-11. 必须保留参考图最显眼、最可能来自原 prompt 的词：主体动作、人物互动、场景、背景地标、牌匾文字、关键道具、屏幕/海报/车辆/灯笼等元素、AI 新增角色的造型细节、真实电影感滤镜。不要描述可替换主体的旧照片穿搭，也不要忽略主体以外的任何重要细节。
+11. 必须保留参考图最显眼、最可能来自原 prompt 的词：主体动作、人物互动、场景、背景地标、牌匾文字、关键道具、屏幕/海报/车辆/灯笼等元素、AI 新增角色的造型细节、真实电影感滤镜。输出时把这些词放进同一段 prompt，不要拆成分析。不要描述可替换主体的旧照片穿搭，也不要忽略主体以外的任何重要细节。
 12. 不要强行加入“low-angle、dust、smoke、dark gritty environment、high contrast、poster style”等泛化词，除非它们是画面核心且原 prompt 很可能会写。
 13. 人物替换方式：ChatGPT 版可以写“photo from the first image / 上传的第一张照片”；Hypic 版可以写“uploaded photo subject / 上传照片人物”。重点是让用户上传自己的照片后能套用。
 14. 如果画面有可识别平台样式，可以写 TikTok profile / 短视频主页；如果有真实用户名，不要复制具体用户名，写 with the username / 带用户名区域 即可。
-15. 禁止输出负面提示词、同款变体、解释说明。
+15. 必须输出负面提示词 negative_prompt。负面提示词要简短实用，覆盖：low quality, blurry, deformed face, wrong identity, changed subject clothes when subject should come from uploaded photo, extra people, extra hands, bad hands, missing fingers, distorted body, unreadable or wrong text on signs, watermark, logo, overexposed, oversaturated, cartoon, anime, plastic skin, messy background。可以根据图片加入专属负面项，例如不要错发色、不要错牌匾文字、不要把 AI 新增女性变成上传照片人物。
+16. 禁止输出同款变体、解释说明、Markdown。
 
 强参考示例，遇到类似“人物走出巨大手机屏幕、TikTok 主页、玻璃碎裂”的图时，英文应该接近这种，而不是专业改写：
 generate a dramatic photo realistic scene of this guy in stylish jeans and green scarf clothes photo from the first image confidently walking out of a giant smartphone screen, the phone screen resembles a tiktok profile with the username, the glass of the phone is shattered with shards flying outward creating a dynamic cinematic filter
@@ -119,7 +121,8 @@ generate a realistic photo of the man from the first image walking hand in hand 
 输出必须是 JSON，不要 Markdown，不要代码块：
 {
   "chatgpt_cn": "接近原始 prompt 写法的中文同款提示词",
-  "chatgpt_en": "English prompt close to the original generation prompt style"
+  "chatgpt_en": "English prompt close to the original generation prompt style",
+  "negative_prompt": "negative prompt in English, short and practical"
 }`;
 }
 
@@ -322,11 +325,13 @@ async function callThirdPartyApi() {
     const parsed = extractJson(content);
     els.chatgptCnOutput.value = parsed.chatgpt_cn || parsed.chatgpt || "";
     els.chatgptEnOutput.value = parsed.chatgpt_en || "";
+    els.negativePromptOutput.value = parsed.negative_prompt || "";
     setStatus("生成完成", "ok");
   } catch (error) {
     setStatus("调用失败", "error");
     els.chatgptCnOutput.value = `调用失败：${readableError(error.message)}`;
     els.chatgptEnOutput.value = "";
+    els.negativePromptOutput.value = "";
   } finally {
     els.generateButton.disabled = false;
     els.generateButton.textContent = "生成同款模板";
@@ -552,6 +557,7 @@ els.copyAllButton.addEventListener("click", () => {
     [
       `ChatGPT 中文模板：\n${els.chatgptCnOutput.value}`,
       `ChatGPT English Template:\n${els.chatgptEnOutput.value}`,
+      `Negative Prompt:\n${els.negativePromptOutput.value}`,
     ].join("\n\n"),
     els.copyAllButton,
     "复制全部",
@@ -573,6 +579,7 @@ els.copyCaptionsButton.addEventListener("click", () => {
 const outputMap = {
   chatgptCn: els.chatgptCnOutput,
   chatgptEn: els.chatgptEnOutput,
+  negativePrompt: els.negativePromptOutput,
   hypicCaption: els.hypicCaptionOutput,
   capcutCaption: els.capcutCaptionOutput,
   capcutReactivationCaption: els.capcutReactivationCaptionOutput,
