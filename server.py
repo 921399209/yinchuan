@@ -13,13 +13,13 @@ MODELS_URL = f"{API_BASE_URL}/models"
 class Handler(SimpleHTTPRequestHandler):
     def do_GET(self):
         if self.path == "/api/config":
+            prompt_api_key = self._server_prompt_api_key()
+            image_api_key = self._server_image_api_key()
             self._json_response(
                 200,
                 {
-                    "serverKeyConfigured": bool(
-                        os.environ.get("LXC_API_KEY", "").strip()
-                        or os.environ.get("CCCJIN_API_KEY", "").strip()
-                    ),
+                    "serverKeyConfigured": bool(prompt_api_key),
+                    "imageKeyConfigured": bool(image_api_key),
                     "defaultModel": os.environ.get("LXC_MODEL", os.environ.get("CCCJIN_MODEL", "gpt-5.5")),
                 },
             )
@@ -149,8 +149,7 @@ class Handler(SimpleHTTPRequestHandler):
 
     def _resolve_api_key(self, data):
         api_key = (
-            os.environ.get("LXC_API_KEY", "").strip()
-            or os.environ.get("CCCJIN_API_KEY", "").strip()
+            self._server_prompt_api_key()
             or data.get("apiKey", "").strip()
         )
         if not api_key:
@@ -158,7 +157,23 @@ class Handler(SimpleHTTPRequestHandler):
         return api_key
 
     def _resolve_image_api_key(self, data):
-        return self._resolve_api_key(data)
+        api_key = (
+            self._server_image_api_key()
+            or data.get("imageApiKey", "").strip()
+            or data.get("apiKey", "").strip()
+        )
+        if not api_key:
+            raise ValueError("Missing image API key. Set LXC_IMAGE_API_KEY on the server.")
+        return api_key
+
+    def _server_prompt_api_key(self):
+        return (
+            os.environ.get("LXC_API_KEY", "").strip()
+            or os.environ.get("CCCJIN_API_KEY", "").strip()
+        )
+
+    def _server_image_api_key(self):
+        return os.environ.get("LXC_IMAGE_API_KEY", "").strip()
 
     def _read_http_error(self, error):
         detail = error.read().decode("utf-8", errors="replace")

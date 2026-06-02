@@ -1,6 +1,6 @@
 # 参考图反推提示词网站
 
-上传参考图后，通过 `https://www.lxc.lt/v1/chat/completions` 调用视觉模型，生成：
+上传参考图后，通过 `https://www.lxc.lt/v1/chat/completions` 调用外部接口生成：
 
 - ChatGPT 中文提示词
 - ChatGPT English Prompt
@@ -19,52 +19,43 @@ python server.py
 http://127.0.0.1:8787/
 ```
 
-## 给其他用户使用
-
-推荐在服务器配置统一 API Key，不要让用户填写你的 Key。
-
-环境变量：
+## 环境变量
 
 ```bash
-LXC_API_KEY=sk-your-api-key-here
+LXC_API_KEY=提示词和文案使用的 lxc API Key
+LXC_IMAGE_API_KEY=gpt-image-2 作图使用的 lxc API Key
 LXC_MODEL=gpt-5.5
 HOST=0.0.0.0
 PORT=8787
 ```
 
-配置后，网页会自动隐藏 API Key 输入框，用户只需要上传图片并点击生成。旧环境变量 `CCCJIN_API_KEY` 仍可作为备用兼容。
+`LXC_API_KEY` 用于参考图反推提示词和 TikTok 文案生成。`LXC_IMAGE_API_KEY` 用于 gpt-image-2 作图接口。两个 Key 可以不同。
 
-## 部署说明
+配置服务器 Key 后，网页会自动隐藏 API Key 输入框，用户只需要上传图片并点击生成。旧环境变量 `CCCJIN_API_KEY` 仍可作为提示词功能的备用兼容。
 
-这是一个纯 Python 标准库小站，不需要安装依赖。支持 Render、Railway、VPS 等能运行 Python Web 进程的平台。
+## Render 部署
 
-### Render 一键部署
-
-1. 把本目录上传到 GitHub 仓库。
-2. 登录 Render，选择 `New` -> `Blueprint`。
-3. 选择这个仓库，Render 会读取 `render.yaml`。
-4. 在环境变量里填入：
+1. 把项目推送到 GitHub 仓库。
+2. 登录 Render，选择当前 Web Service。
+3. 打开 `Environment` 页面。
+4. 添加或修改：
 
 ```bash
-LXC_API_KEY=你的 lxc API Key
+LXC_API_KEY=提示词和文案 Key
+LXC_IMAGE_API_KEY=作图 Key
+LXC_MODEL=gpt-5.5
 ```
 
-5. 部署完成后，Render 会给你一个稳定网址，例如：
+5. 保存环境变量后，在 `Deploys` 页面选择部署最新提交。
+
+部署完成后，Render 会提供长期网址，例如：
 
 ```text
 https://prompt-reverse-site.onrender.com
 ```
 
-启动命令：
-
-```bash
-python server.py
-```
-
-如果部署平台会注入 `PORT`，本服务会自动读取。
-
 ## 注意
 
-- 需要选择支持图片输入的模型。
-- 如果返回 `Service temporarily unavailable`，通常是模型通道不可用，换一个视觉模型再试。
 - 不要把真实 API Key 写进前端代码或公开仓库。
+- 如果提示 `Service temporarily unavailable`，通常是上游模型通道临时不可用。
+- 作图功能固定使用 `gpt-image-2`，接口走 `https://www.lxc.lt/v1/chat/completions`。

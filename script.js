@@ -44,6 +44,7 @@ const els = {
 };
 
 let serverKeyConfigured = false;
+let imageKeyConfigured = false;
 const FIXED_MODEL = "gpt-5.5";
 const FIXED_MODEL_LABEL = "GPT-5.5";
 const IMAGE_MODEL = "gpt-image-2";
@@ -58,6 +59,7 @@ async function loadServerConfig() {
     const response = await fetch("/api/config");
     const config = await response.json();
     serverKeyConfigured = Boolean(config.serverKeyConfigured);
+    imageKeyConfigured = Boolean(config.imageKeyConfigured);
     els.modelInput.value = FIXED_MODEL;
     if (serverKeyConfigured) {
       els.apiKeyInput.value = "";
@@ -66,7 +68,9 @@ async function loadServerConfig() {
       els.apiKeyField.classList.add("hidden-field");
       els.apiKeyField.hidden = true;
       els.apiKeyField.style.display = "none";
-      els.apiHint.textContent = `站点已配置统一 API Key，接口统一走 www.lxc.lt/v1，提示词固定使用 ${FIXED_MODEL_LABEL}。上传图片后直接生成即可。`;
+      els.apiHint.textContent = imageKeyConfigured
+        ? `站点已配置提示词 Key 和作图 Key，接口统一走 www.lxc.lt/v1，提示词固定使用 ${FIXED_MODEL_LABEL}，作图固定使用 ${IMAGE_MODEL}。`
+        : `站点已配置提示词 Key。作图功能如需单独 Key，请在 Render 添加 LXC_IMAGE_API_KEY。`;
       setStatus("站点已配置", "ok");
     }
   } catch {
@@ -399,7 +403,7 @@ async function generateImageWithGptImage2() {
   const apiKey = els.apiKeyInput.value.trim();
   const prompt = els.imagePromptInput.value.trim() || els.chatgptEnOutput.value.trim();
 
-  if (!apiKey && !serverKeyConfigured) {
+  if (!apiKey && !imageKeyConfigured) {
     setStatus("缺少 API Key", "error");
     els.apiKeyInput.focus();
     return;

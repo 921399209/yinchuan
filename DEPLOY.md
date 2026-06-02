@@ -13,7 +13,8 @@ http://127.0.0.1:8787/
 部署到服务器时，设置环境变量：
 
 ```bash
-LXC_API_KEY=你的 lxc API Key
+LXC_API_KEY=提示词和文案使用的 lxc API Key
+LXC_IMAGE_API_KEY=gpt-image-2 作图使用的 lxc API Key
 LXC_MODEL=gpt-5.5
 HOST=0.0.0.0
 PORT=8787
@@ -25,4 +26,4 @@ PORT=8787
 python server.py
 ```
 
-配置 `LXC_API_KEY` 后，用户页面不会显示 API Key 输入框，只需要上传参考图并点击生成。旧的 `CCCJIN_API_KEY` 仍可作为备用兼容。
+配置 `LXC_API_KEY` 后，用户页面不会显示 API Key 输入框，只需要上传参考图并点击生成。配置 `LXC_IMAGE_API_KEY` 后，gpt-image-2 作图功能会使用单独的作图 Key。旧的 `CCCJIN_API_KEY` 仍可作为提示词功能的备用兼容。

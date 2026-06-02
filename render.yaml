@@ -12,3 +12,5 @@ services:
         value: gpt-5.5
       - key: LXC_API_KEY
         sync: false
+      - key: LXC_IMAGE_API_KEY
+        sync: false
