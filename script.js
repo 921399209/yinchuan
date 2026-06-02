@@ -83,7 +83,7 @@ async function loadServerConfig() {
 function buildInstruction() {
   return `Analyze the uploaded image as if you are reconstructing the original text-to-image prompt.
 
-Generate a highly detailed English prompt that could recreate an image extremely close to the reference.
+Generate a highly detailed English prompt that could recreate an image extremely close to the reference. Accuracy is more important than brevity.
 
 Focus on: subject, pose, facial expression, clothing, environment, composition, camera angle, lens, lighting, color palette, texture, material, artistic style, rendering style, mood, depth of field, background details, realism level, and image quality.
 
@@ -102,14 +102,19 @@ Additional reconstruction rules:
 1. Output English only.
 2. The Main Prompt must be a single highly detailed prompt, not an explanation. It may be long if needed for accuracy.
 3. Preserve visible details aggressively: subject, pose, expression, clothing, environment, composition, camera angle, lens feeling, lighting, color palette, textures, material, style, rendering, mood, depth of field, background details, realism, and image quality.
-4. If the user defines a replaceable subject in “你的照片主体”, describe that subject as the uploaded/photo subject and keep only pose, position, action, and interaction. Do not lock that replaceable subject's old face, hair, skin tone, clothing, shoes, accessories, logos, or material, because the user will upload a new subject photo.
-5. Everything outside the replaceable subject must be locked in detail. If there is an AI-generated companion/person, describe their age range, ethnicity or regional look, skin tone, facial vibe, hair color, hairstyle, body type, outfit, shoes, bag, accessories, expression, pose, position, gaze, and interaction.
-6. If visible text, plaques, lanterns, signs, usernames, screens, posters, storefronts, or interface elements appear, describe their position, color, material, typography style, and readable or approximate text. Do not omit sign text.
-7. If the image has a raw viral prompt style, infer that style but keep the final Main Prompt precise and usable.
-8. Negative Prompt must be practical and image-specific.
-9. Suggested Model / Style should name suitable model families or generation modes, for example GPT image generation, Midjourney realistic/editorial, Flux photoreal, cinematic composite, fashion editorial, or product render, based on the image.
-10. Suggested Parameters should include useful settings such as aspect ratio, lens/camera feel, quality/detail, stylize/style strength, CFG, steps, seed consistency, and any image-reference strength guidance. Use generic parameters when platform-specific settings are uncertain.
-11. Return JSON only. No Markdown, no numbered list text, no code block.
+4. The Main Prompt must explicitly reconstruct the exact pose and action: body direction, head angle, gaze direction, hand/arm/leg placement, walking or standing motion, interaction with objects or other people, and the subject's position in the frame.
+5. The Main Prompt must explicitly reconstruct the camera and composition: vertical/horizontal framing, full body/half body/close-up, low angle/high angle/eye-level, centered or off-center placement, foreground/midground/background layering, lens feel, perspective distortion, crop, and depth of field.
+6. The Main Prompt must explicitly reconstruct light and shadow: main light direction, rim light, backlight, soft or hard shadows, highlights, reflections, glow, contrast level, exposure, color temperature, haze, smoke, dust, or volumetric light if visible.
+7. The Main Prompt must explicitly reconstruct scene details: background architecture, signs, plaques, readable or approximate text, screen UI, props, ground texture, furniture, plants, weather, particles, broken glass, fabric texture, metal, skin, hair, and any visible material details.
+8. Avoid generic filler unless it is visibly true. Do not rely only on phrases like cinematic, high quality, ultra realistic, dramatic lighting, or detailed background. Every style word should be tied to a visible detail.
+9. If the user defines a replaceable subject in “你的照片主体”, describe that subject as the uploaded/photo subject and keep only pose, position, action, and interaction. Do not lock that replaceable subject's old face, hair, skin tone, clothing, shoes, accessories, logos, or material, because the user will upload a new subject photo.
+10. Everything outside the replaceable subject must be locked in detail. If there is an AI-generated companion/person, describe their age range, ethnicity or regional look, skin tone, facial vibe, hair color, hairstyle, body type, outfit, shoes, bag, accessories, expression, pose, position, gaze, and interaction.
+11. If visible text, plaques, lanterns, signs, usernames, screens, posters, storefronts, or interface elements appear, describe their position, color, material, typography style, and readable or approximate text. Do not omit sign text.
+12. If the image has a raw viral prompt style, infer that style but keep the final Main Prompt precise and usable.
+13. Negative Prompt must be practical and image-specific, including wrong pose, wrong camera angle, wrong lighting direction, missing background details, unreadable text, changed outfit on non-replaceable characters, and missing visible props when relevant.
+14. Suggested Model / Style should name suitable model families or generation modes, for example GPT image generation, Midjourney realistic/editorial, Flux photoreal, cinematic composite, fashion editorial, or product render, based on the image.
+15. Suggested Parameters should include useful settings such as aspect ratio, lens/camera feel, quality/detail, stylize/style strength, CFG, steps, seed consistency, and any image-reference strength guidance. Use generic parameters when platform-specific settings are uncertain.
+16. Return JSON only. No Markdown, no numbered list text, no code block.
 
 输出必须是 JSON，不要 Markdown，不要代码块：
 {
