@@ -19,8 +19,6 @@ const els = {
   apiHint: document.querySelector("#apiHint"),
   chatgptCnOutput: document.querySelector("#chatgptCnOutput"),
   chatgptEnOutput: document.querySelector("#chatgptEnOutput"),
-  negativePromptOutput: document.querySelector("#negativePromptOutput"),
-  suggestedParametersOutput: document.querySelector("#suggestedParametersOutput"),
   imagePromptInput: document.querySelector("#imagePromptInput"),
   generationImageInput: document.querySelector("#generationImageInput"),
   generationPreviewWrap: document.querySelector("#generationPreviewWrap"),
@@ -99,32 +97,31 @@ If the image looks AI-generated, infer the likely prompt style and parameters.
 - 保留重点：${els.focusSelect.value}
 
 Additional reconstruction rules:
-1. Output English only.
-2. The Main Prompt must be a single highly detailed prompt, not an explanation. It may be long if needed for accuracy.
-3. Preserve visible details aggressively: subject, pose, expression, clothing, environment, composition, camera angle, lens feeling, lighting, color palette, textures, material, style, rendering, mood, depth of field, background details, realism, and image quality.
-4. Only one thing may change: the selected person's identity/face from the user's selfie. Everything else visible must match the effect image as closely as possible: facial expression, eye gaze direction, head angle, body pose, hands, legs, clothing, outfit colors, hairstyle silhouette, accessories, lighting, camera angle, composition, background, props, text, and atmosphere.
-5. The Main Prompt must explicitly reconstruct the camera and composition: vertical/horizontal framing, full body/half body/close-up, low angle/high angle/eye-level, centered or off-center placement, foreground/midground/background layering, lens feel, perspective distortion, crop, and depth of field.
-6. The Main Prompt must explicitly reconstruct light and shadow: main light direction, rim light, backlight, soft or hard shadows, highlights, reflections, glow, contrast level, exposure, color temperature, haze, smoke, dust, or volumetric light if visible.
-7. The Main Prompt must explicitly reconstruct scene details: background architecture, signs, plaques, readable or approximate text, screen UI, props, ground texture, furniture, plants, weather, particles, broken glass, fabric texture, metal, skin, hair, and any visible material details.
-8. The Main Prompt must state the exact gaze direction and eye target. Examples: eyes looking left, looking to the upper right, looking down at the ground, looking directly at camera, looking at the woman beside him. If the effect image looks left, the prompt must say looking left. If the eyes look away from camera, the prompt must say away from camera.
-9. The Main Prompt must explicitly reconstruct the exact pose and action: body direction, head angle, gaze direction, hand/arm/leg placement, walking or standing motion, interaction with objects or other people, and the subject's position in the frame.
-10. Avoid generic filler unless it is visibly true. Do not rely only on phrases like cinematic, high quality, ultra realistic, dramatic lighting, or detailed background. Every style word should be tied to a visible detail.
-11. For the selected subject in “你的照片主体”, do not describe the old facial identity, exact facial features, old skin tone, old face shape, or old personal identity. Instead write that the face/identity should come from the uploaded selfie/photo, while the facial expression, eye direction, head angle, pose, clothing, outfit colors, accessories, hair styling seen in the effect, body posture, and scene must remain the same as the effect image.
-12. Lock the effect image's subject styling unless the user explicitly chooses a clothing-replacement strategy: clothing type, clothing color, fabric, shoes, accessories, hairstyle shape, eye gaze, expression, and body action should be described as fixed visual targets. If hands, arms, legs, or body shape are visible, describe their position and gesture accurately.
-13. Everything outside the selected subject's identity must be locked in detail. If there is an AI-generated companion/person, describe their age range, ethnicity or regional look, skin tone, facial vibe, hair color, hairstyle, body type, outfit, shoes, bag, accessories, expression, pose, position, gaze, and interaction.
-14. If visible text, plaques, lanterns, signs, usernames, screens, posters, storefronts, or interface elements appear, describe their position, color, material, typography style, and readable or approximate text. Do not omit sign text.
-15. If the image has a raw viral prompt style, infer that style but keep the final Main Prompt precise and usable.
-16. Negative Prompt must be practical and image-specific, including wrong face identity, changed expression, wrong gaze direction, eyes looking the wrong way, wrong head angle, wrong pose, changed clothing, wrong camera angle, wrong lighting direction, missing background details, unreadable text, changed outfit on non-replaceable characters, and missing visible props when relevant.
-17. Suggested Model / Style should name suitable model families or generation modes, for example GPT image generation, Midjourney realistic/editorial, Flux photoreal, cinematic composite, fashion editorial, or product render, based on the image.
-18. Suggested Parameters should include useful settings such as aspect ratio, lens/camera feel, quality/detail, stylize/style strength, CFG, steps, seed consistency, and any image-reference strength guidance. Use generic parameters when platform-specific settings are uncertain.
-19. Return JSON only. No Markdown, no numbered list text, no code block.
+1. Output two complete bundled prompt blocks: one in Chinese and one in English.
+2. Each bundled prompt block must include Main Prompt, Negative Prompt, Suggested Model / Style, and Suggested Parameters together in one text. Do not split them into separate UI fields.
+3. The Main Prompt must be a single highly detailed prompt, not an explanation. It may be long if needed for accuracy.
+4. Preserve visible details aggressively: subject, pose, expression, clothing, environment, composition, camera angle, lens feeling, lighting, color palette, textures, material, style, rendering, mood, depth of field, background details, realism, and image quality.
+5. Only one thing may change: the selected person's identity/face from the user's selfie. Everything else visible must match the effect image as closely as possible: facial expression, eye gaze direction, head angle, body pose, hands, legs, clothing, outfit colors, hairstyle silhouette, accessories, lighting, camera angle, composition, background, props, text, and atmosphere.
+6. The Main Prompt must explicitly reconstruct the camera and composition: vertical/horizontal framing, full body/half body/close-up, low angle/high angle/eye-level, centered or off-center placement, foreground/midground/background layering, lens feel, perspective distortion, crop, and depth of field.
+7. The Main Prompt must explicitly reconstruct light and shadow: main light direction, rim light, backlight, soft or hard shadows, highlights, reflections, glow, contrast level, exposure, color temperature, haze, smoke, dust, or volumetric light if visible.
+8. The Main Prompt must explicitly reconstruct scene details: background architecture, signs, plaques, readable or approximate text, screen UI, props, ground texture, furniture, plants, weather, particles, broken glass, fabric texture, metal, skin, hair, and any visible material details.
+9. The Main Prompt must state the exact gaze direction and eye target. Examples: eyes looking left, looking to the upper right, looking down at the ground, looking directly at camera, looking at the woman beside him. If the effect image looks left, the prompt must say looking left. If the eyes look away from camera, the prompt must say away from camera.
+10. The Main Prompt must explicitly reconstruct the exact pose and action: body direction, head angle, gaze direction, hand/arm/leg placement, walking or standing motion, interaction with objects or other people, and the subject's position in the frame.
+11. Avoid generic filler unless it is visibly true. Do not rely only on phrases like cinematic, high quality, ultra realistic, dramatic lighting, or detailed background. Every style word should be tied to a visible detail.
+12. For the selected subject in “你的照片主体”, do not describe the old facial identity, exact facial features, old skin tone, old face shape, or old personal identity. Instead write that the face/identity should come from the uploaded selfie/photo, while the facial expression, eye direction, head angle, pose, clothing, outfit colors, accessories, hair styling seen in the effect, body posture, and scene must remain the same as the effect image.
+13. Lock the effect image's subject styling unless the user explicitly chooses a clothing-replacement strategy: clothing type, clothing color, fabric, shoes, accessories, hairstyle shape, eye gaze, expression, and body action should be described as fixed visual targets. If hands, arms, legs, or body shape are visible, describe their position and gesture accurately.
+14. Everything outside the selected subject's identity must be locked in detail. If there is an AI-generated companion/person, describe their age range, ethnicity or regional look, skin tone, facial vibe, hair color, hairstyle, body type, outfit, shoes, bag, accessories, expression, pose, position, gaze, and interaction.
+15. If visible text, plaques, lanterns, signs, usernames, screens, posters, storefronts, or interface elements appear, describe their position, color, material, typography style, and readable or approximate text. Do not omit sign text.
+16. If the image has a raw viral prompt style, infer that style but keep the final Main Prompt precise and usable.
+17. Negative Prompt must be practical and image-specific, including wrong face identity, changed expression, wrong gaze direction, eyes looking the wrong way, wrong head angle, wrong pose, changed clothing, wrong camera angle, wrong lighting direction, missing background details, unreadable text, changed outfit on non-replaceable characters, and missing visible props when relevant.
+18. Suggested Model / Style should name suitable model families or generation modes, for example GPT image generation, Midjourney realistic/editorial, Flux photoreal, cinematic composite, fashion editorial, or product render, based on the image.
+19. Suggested Parameters should include useful settings such as aspect ratio, lens/camera feel, quality/detail, stylize/style strength, CFG, steps, seed consistency, and any image-reference strength guidance. Use generic parameters when platform-specific settings are uncertain.
+20. Return JSON only. No Markdown, no code block.
 
 输出必须是 JSON，不要 Markdown，不要代码块：
 {
-  "main_prompt": "Main Prompt",
-  "negative_prompt": "Negative Prompt",
-  "suggested_model_style": "Suggested Model / Style",
-  "suggested_parameters": "Suggested Parameters"
+  "cn_full_prompt": "中文完整版本，包含：主提示词、负面提示词、建议模型/风格、建议参数",
+  "en_full_prompt": "English full version including: Main Prompt, Negative Prompt, Suggested Model / Style, Suggested Parameters"
 }`;
 }
 
@@ -282,6 +279,7 @@ function showGeneratedImage(src) {
   }
   els.generatedImage.src = src;
   els.generatedImageLink.href = src;
+  els.generatedImageLink.download = "generated-image.png";
   els.generatedImageWrap.classList.add("visible");
 }
 
@@ -325,17 +323,19 @@ async function callThirdPartyApi() {
 
     const content = payload.content || "";
     const parsed = extractJson(content);
-    els.chatgptEnOutput.value = parsed.main_prompt || parsed.chatgpt_en || "";
-    els.chatgptCnOutput.value = parsed.suggested_model_style || parsed.chatgpt_cn || parsed.chatgpt || "";
-    els.negativePromptOutput.value = parsed.negative_prompt || "";
-    els.suggestedParametersOutput.value = parsed.suggested_parameters || "";
+    const englishFallback = [
+      parsed.main_prompt ? `Main Prompt:\n${parsed.main_prompt}` : "",
+      parsed.negative_prompt ? `Negative Prompt:\n${parsed.negative_prompt}` : "",
+      parsed.suggested_model_style ? `Suggested Model / Style:\n${parsed.suggested_model_style}` : "",
+      parsed.suggested_parameters ? `Suggested Parameters:\n${parsed.suggested_parameters}` : "",
+    ].filter(Boolean).join("\n\n");
+    els.chatgptCnOutput.value = parsed.cn_full_prompt || parsed.chatgpt_cn || parsed.chatgpt || "";
+    els.chatgptEnOutput.value = parsed.en_full_prompt || englishFallback || parsed.chatgpt_en || "";
     setStatus("生成完成", "ok");
   } catch (error) {
     setStatus("调用失败", "error");
     els.chatgptEnOutput.value = `调用失败：${readableError(error.message)}`;
     els.chatgptCnOutput.value = "";
-    els.negativePromptOutput.value = "";
-    els.suggestedParametersOutput.value = "";
   } finally {
     els.generateButton.disabled = false;
     els.generateButton.textContent = "生成同款模板";
@@ -439,7 +439,7 @@ async function generateImageWithGptImage2() {
   els.generateImageButton.disabled = true;
   els.generateImageButton.textContent = "正在生图...";
   showGeneratedImage("");
-  els.imageGenerationRawOutput.value = "";
+  if (els.imageGenerationRawOutput) els.imageGenerationRawOutput.value = "";
 
   try {
     const response = await fetch("/api/generate-image", {
@@ -459,19 +459,21 @@ async function generateImageWithGptImage2() {
     }
 
     const image = payload.images?.[0] || extractImageFromText(payload.content);
-    els.imageGenerationRawOutput.value = payload.content || JSON.stringify(payload.raw || payload, null, 2);
+    if (els.imageGenerationRawOutput) {
+      els.imageGenerationRawOutput.value = payload.content || JSON.stringify(payload.raw || payload, null, 2);
+    }
     if (image) {
       showGeneratedImage(image);
       els.imageGenerationStatus.textContent = "生图完成";
       setStatus("生图完成", "ok");
     } else {
-      els.imageGenerationStatus.textContent = "接口已返回，但没有解析到图片，已显示原始返回。";
+      els.imageGenerationStatus.textContent = "接口已返回，但没有解析到图片。";
       setStatus("已返回文本", "ok");
     }
   } catch (error) {
     const message = readableError(error.message);
     els.imageGenerationStatus.textContent = `调用失败：${message}`;
-    els.imageGenerationRawOutput.value = `调用失败：${message}`;
+    if (els.imageGenerationRawOutput) els.imageGenerationRawOutput.value = `调用失败：${message}`;
     setStatus("调用失败", "error");
   } finally {
     els.generateImageButton.disabled = false;
@@ -559,10 +561,8 @@ els.generateImageButton.addEventListener("click", generateImageWithGptImage2);
 els.copyAllButton.addEventListener("click", () => {
   copyText(
     [
-      `Main Prompt:\n${els.chatgptEnOutput.value}`,
-      `Negative Prompt:\n${els.negativePromptOutput.value}`,
-      `Suggested Model / Style:\n${els.chatgptCnOutput.value}`,
-      `Suggested Parameters:\n${els.suggestedParametersOutput.value}`,
+      `中文完整提示词：\n${els.chatgptCnOutput.value}`,
+      `English Full Prompt:\n${els.chatgptEnOutput.value}`,
     ].join("\n\n"),
     els.copyAllButton,
     "复制全部",
@@ -584,8 +584,6 @@ els.copyCaptionsButton.addEventListener("click", () => {
 const outputMap = {
   chatgptCn: els.chatgptCnOutput,
   chatgptEn: els.chatgptEnOutput,
-  negativePrompt: els.negativePromptOutput,
-  suggestedParameters: els.suggestedParametersOutput,
   hypicCaption: els.hypicCaptionOutput,
   capcutCaption: els.capcutCaptionOutput,
   capcutReactivationCaption: els.capcutReactivationCaptionOutput,
