@@ -1,6 +1,8 @@
 ﻿const state = {
   imageDataUrl: "",
   fileName: "",
+  generationImageDataUrl: "",
+  generationFileName: "",
 };
 
 const els = {
@@ -17,6 +19,17 @@ const els = {
   apiHint: document.querySelector("#apiHint"),
   chatgptCnOutput: document.querySelector("#chatgptCnOutput"),
   chatgptEnOutput: document.querySelector("#chatgptEnOutput"),
+  imagePromptInput: document.querySelector("#imagePromptInput"),
+  generationImageInput: document.querySelector("#generationImageInput"),
+  generationPreviewWrap: document.querySelector("#generationPreviewWrap"),
+  generationPreviewImage: document.querySelector("#generationPreviewImage"),
+  useEnglishPromptButton: document.querySelector("#useEnglishPromptButton"),
+  generateImageButton: document.querySelector("#generateImageButton"),
+  imageGenerationStatus: document.querySelector("#imageGenerationStatus"),
+  generatedImageWrap: document.querySelector("#generatedImageWrap"),
+  generatedImage: document.querySelector("#generatedImage"),
+  generatedImageLink: document.querySelector("#generatedImageLink"),
+  imageGenerationRawOutput: document.querySelector("#imageGenerationRawOutput"),
   hypicCaptionOutput: document.querySelector("#hypicCaptionOutput"),
   capcutCaptionOutput: document.querySelector("#capcutCaptionOutput"),
   capcutReactivationCaptionOutput: document.querySelector("#capcutReactivationCaptionOutput"),
@@ -33,6 +46,7 @@ const els = {
 let serverKeyConfigured = false;
 const FIXED_MODEL = "gpt-5.5";
 const FIXED_MODEL_LABEL = "GPT-5.5";
+const IMAGE_MODEL = "gpt-image-2";
 
 function setStatus(text, tone = "idle") {
   els.apiStatus.textContent = text;
@@ -52,7 +66,7 @@ async function loadServerConfig() {
       els.apiKeyField.classList.add("hidden-field");
       els.apiKeyField.hidden = true;
       els.apiKeyField.style.display = "none";
-      els.apiHint.textContent = `站点已配置统一 API Key，固定使用 ${FIXED_MODEL_LABEL}。上传图片后直接生成即可。`;
+      els.apiHint.textContent = `站点已配置统一 API Key，接口统一走 www.lxc.lt/v1，提示词固定使用 ${FIXED_MODEL_LABEL}。上传图片后直接生成即可。`;
       setStatus("站点已配置", "ok");
     }
   } catch {
@@ -228,7 +242,7 @@ function readableError(errorText) {
     return `${FIXED_MODEL_LABEL} 或上游通道临时不可用，请稍后重试。`;
   }
   if (/Unauthorized|invalid api key|401/i.test(text)) {
-    return "API Key 无效或没有权限，请检查 apis.cccjin.cn 后台生成的 Key。";
+    return "API Key 无效或没有权限，请检查 www.lxc.lt 后台生成的 Key。";
   }
   if (/model|not found|unsupported/i.test(text)) {
     return "模型名不可用或不支持图片输入，请换用后台可用的视觉模型。";
@@ -237,6 +251,29 @@ function readableError(errorText) {
     return "账号额度、余额或频率限制不足，请检查平台后台。";
   }
   return text;
+}
+
+function extractImageFromText(text) {
+  const source = String(text || "");
+  const markdownMatch = source.match(/!\[[^\]]*\]\(([^)]+)\)/);
+  if (markdownMatch) return markdownMatch[1].trim();
+  const urlMatch = source.match(/https?:\/\/[^\s)"']+/);
+  if (urlMatch) return urlMatch[0];
+  const dataMatch = source.match(/data:image\/[a-zA-Z0-9.+-]+;base64,[A-Za-z0-9+/=]+/);
+  if (dataMatch) return dataMatch[0];
+  return "";
+}
+
+function showGeneratedImage(src) {
+  if (!src) {
+    els.generatedImageWrap.classList.remove("visible");
+    els.generatedImage.removeAttribute("src");
+    els.generatedImageLink.href = "#";
+    return;
+  }
+  els.generatedImage.src = src;
+  els.generatedImageLink.href = src;
+  els.generatedImageWrap.classList.add("visible");
 }
 
 async function callThirdPartyApi() {
@@ -358,6 +395,77 @@ async function generateTikTokCaptions() {
   }
 }
 
+async function generateImageWithGptImage2() {
+  const apiKey = els.apiKeyInput.value.trim();
+  const prompt = els.imagePromptInput.value.trim() || els.chatgptEnOutput.value.trim();
+
+  if (!apiKey && !serverKeyConfigured) {
+    setStatus("缺少 API Key", "error");
+    els.apiKeyInput.focus();
+    return;
+  }
+
+  if (!state.imageDataUrl) {
+    setStatus("请先上传主体图或参考图", "error");
+    return;
+  }
+
+  if (!state.generationImageDataUrl) {
+    els.imageGenerationStatus.textContent = "请先在 gpt-image-2 区域上传自己的主体图。";
+    els.generationImageInput.focus();
+    return;
+  }
+
+  if (!prompt) {
+    els.imageGenerationStatus.textContent = "请先填写生图提示词，或点击使用英文模板。";
+    return;
+  }
+
+  if (apiKey) localStorage.setItem("cccjin_api_key", apiKey);
+  els.imageGenerationStatus.textContent = "正在调用 gpt-image-2...";
+  els.generateImageButton.disabled = true;
+  els.generateImageButton.textContent = "正在生图...";
+  showGeneratedImage("");
+  els.imageGenerationRawOutput.value = "";
+
+  try {
+    const response = await fetch("/api/generate-image", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        apiKey,
+        model: IMAGE_MODEL,
+        image: state.generationImageDataUrl,
+        prompt,
+      }),
+    });
+
+    const payload = await response.json();
+    if (!response.ok) {
+      throw new Error(readableError(payload.error || `接口调用失败：${response.status}`));
+    }
+
+    const image = payload.images?.[0] || extractImageFromText(payload.content);
+    els.imageGenerationRawOutput.value = payload.content || JSON.stringify(payload.raw || payload, null, 2);
+    if (image) {
+      showGeneratedImage(image);
+      els.imageGenerationStatus.textContent = "生图完成";
+      setStatus("生图完成", "ok");
+    } else {
+      els.imageGenerationStatus.textContent = "接口已返回，但没有解析到图片，已显示原始返回。";
+      setStatus("已返回文本", "ok");
+    }
+  } catch (error) {
+    const message = readableError(error.message);
+    els.imageGenerationStatus.textContent = `调用失败：${message}`;
+    els.imageGenerationRawOutput.value = `调用失败：${message}`;
+    setStatus("调用失败", "error");
+  } finally {
+    els.generateImageButton.disabled = false;
+    els.generateImageButton.textContent = "调用 gpt-image-2 生图";
+  }
+}
+
 function loadFile(file) {
   if (!file || !file.type.startsWith("image/")) return;
   const reader = new FileReader();
@@ -367,6 +475,19 @@ function loadFile(file) {
     els.previewImage.src = reader.result;
     els.previewWrap.classList.add("visible");
     setStatus("图片已就绪", "ok");
+  };
+  reader.readAsDataURL(file);
+}
+
+function loadGenerationFile(file) {
+  if (!file || !file.type.startsWith("image/")) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    state.generationImageDataUrl = reader.result;
+    state.generationFileName = file.name;
+    els.generationPreviewImage.src = reader.result;
+    els.generationPreviewWrap.classList.add("visible");
+    els.imageGenerationStatus.textContent = "主体图已就绪，可以调用 gpt-image-2。";
   };
   reader.readAsDataURL(file);
 }
@@ -385,6 +506,10 @@ loadServerConfig();
 
 els.input.addEventListener("change", (event) => {
   loadFile(event.target.files[0]);
+});
+
+els.generationImageInput.addEventListener("change", (event) => {
+  loadGenerationFile(event.target.files[0]);
 });
 
 ["dragenter", "dragover"].forEach((eventName) => {
@@ -412,6 +537,11 @@ document.addEventListener("paste", (event) => {
 
 els.generateButton.addEventListener("click", callThirdPartyApi);
 els.generateCopyButton.addEventListener("click", generateTikTokCaptions);
+els.useEnglishPromptButton.addEventListener("click", () => {
+  els.imagePromptInput.value = els.chatgptEnOutput.value.trim();
+  els.imagePromptInput.focus();
+});
+els.generateImageButton.addEventListener("click", generateImageWithGptImage2);
 
 els.copyAllButton.addEventListener("click", () => {
   copyText(

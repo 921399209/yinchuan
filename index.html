@@ -42,7 +42,7 @@
             </label>
             <button class="ghost-button wide-button" id="generateButton" type="button">生成同款模板</button>
             <button class="secondary-button wide-button" id="generateCopyButton" type="button">生成 TikTok 文案</button>
-            <p class="hint" id="apiHint">固定使用 GPT-5.5，通过第三方视觉接口生成，不使用本地识别。</p>
+            <p class="hint" id="apiHint">固定使用 GPT-5.5，所有功能统一调用 www.lxc.lt/v1，不使用本地识别。</p>
           </div>
         </aside>
 
@@ -139,6 +139,34 @@
               <textarea id="chatgptEnOutput" spellcheck="false" placeholder="Use this with your own uploaded photo in ChatGPT"></textarea>
             </section>
           </div>
+
+          <section class="image-generator-panel">
+            <div class="section-title">
+              <span>gpt-image-2 直接生图</span>
+              <button class="text-button" id="useEnglishPromptButton" type="button">使用英文模板</button>
+            </div>
+            <label class="mini-upload">
+              上传自己的主体图
+              <input id="generationImageInput" type="file" accept="image/*" />
+              <small class="field-hint">这里上传你要替换进去的人物/产品照片，不是参考效果图。</small>
+            </label>
+            <div class="generation-preview-wrap" id="generationPreviewWrap">
+              <img id="generationPreviewImage" alt="生图主体图预览" />
+            </div>
+            <label>
+              生图提示词
+              <textarea id="imagePromptInput" spellcheck="false" placeholder="可以粘贴上面的英文模板，或自己修改后调用 gpt-image-2 生成图片"></textarea>
+            </label>
+            <div class="image-actions">
+              <button class="ghost-button" id="generateImageButton" type="button">调用 gpt-image-2 生图</button>
+              <span class="field-hint" id="imageGenerationStatus">模型固定为 gpt-image-2，作图接口走 www.lxc.lt/v1/chat/completions。</span>
+            </div>
+            <div class="generated-image-wrap" id="generatedImageWrap">
+              <img id="generatedImage" alt="gpt-image-2 生成结果" />
+              <a id="generatedImageLink" href="#" target="_blank" rel="noreferrer">打开原图</a>
+            </div>
+            <textarea id="imageGenerationRawOutput" class="raw-output" spellcheck="false" readonly placeholder="如果接口返回的是文本或暂时没有解析到图片，会显示在这里"></textarea>
+          </section>
 
           <div class="section-title copy-section-title">
             <span>TikTok 文案分类</span>

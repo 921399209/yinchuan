@@ -13,8 +13,8 @@ http://127.0.0.1:8787/
 部署到服务器时，设置环境变量：
 
 ```bash
-CCCJIN_API_KEY=你的聚策APIKey
-CCCJIN_MODEL=gemini-2.5-flash
+LXC_API_KEY=你的 lxc API Key
+LXC_MODEL=gpt-5.5
 HOST=0.0.0.0
 PORT=8787
 ```
@@ -25,4 +25,4 @@ PORT=8787
 python server.py
 ```
 
-配置 `CCCJIN_API_KEY` 后，用户页面不会显示 API Key 输入框，只需要上传参考图并点击生成。
+配置 `LXC_API_KEY` 后，用户页面不会显示 API Key 输入框，只需要上传参考图并点击生成。旧的 `CCCJIN_API_KEY` 仍可作为备用兼容。

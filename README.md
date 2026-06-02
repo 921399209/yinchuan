@@ -1,11 +1,11 @@
 # 参考图反推提示词网站
 
-上传参考图后，通过 `https://apis.cccjin.cn/v1/chat/completions` 调用视觉模型，生成：
+上传参考图后，通过 `https://www.lxc.lt/v1/chat/completions` 调用视觉模型，生成：
 
 - ChatGPT 中文提示词
 - ChatGPT English Prompt
-- Hypic 中文提示词
-- Hypic English Prompt
+- TikTok 多语言文案
+- gpt-image-2 直接生图
 
 ## 本地运行
 
@@ -26,13 +26,13 @@ http://127.0.0.1:8787/
 环境变量：
 
 ```bash
-CCCJIN_API_KEY=sk-your-api-key-here
-CCCJIN_MODEL=gemini-2.5-flash
+LXC_API_KEY=sk-your-api-key-here
+LXC_MODEL=gpt-5.5
 HOST=0.0.0.0
 PORT=8787
 ```
 
-配置后，网页会自动隐藏 API Key 输入框，用户只需要上传图片并点击生成。
+配置后，网页会自动隐藏 API Key 输入框，用户只需要上传图片并点击生成。旧环境变量 `CCCJIN_API_KEY` 仍可作为备用兼容。
 
 ## 部署说明
 
@@ -46,7 +46,7 @@ PORT=8787
 4. 在环境变量里填入：
 
 ```bash
-CCCJIN_API_KEY=你的聚策APIKey
+LXC_API_KEY=你的 lxc API Key
 ```
 
 5. 部署完成后，Render 会给你一个稳定网址，例如：
