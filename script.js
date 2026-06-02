@@ -80,8 +80,8 @@ function buildInstruction() {
 6. “你的照片主体”是强控制条件，也是唯一可替换变量。只要用户在这个字段里确定了主体，例如“图片中的男性/女性/左边人物/中间人物/我的产品/我的宠物”，输出时就只能把这个主体写成 man/woman/person/product/pet from the first image / 上传照片里的主体；绝对不要描述这个可替换主体的脸、发型、肤色、年龄、身材、衣服、裤子、鞋子、配饰、文字 logo、颜色、材质等外观细节，因为用户会重新上传另一张主体照片，这些细节必须由新照片自己决定。
 7. 对可替换主体只保留动作、姿势、站位和互动关系，例如 walking, standing on the left, holding hands, looking at the woman, sitting, leaning, holding an object, walking beside her。主体的动作可以写，主体的外貌、穿搭、材质和旧照片特征不要写。
 8. 除了用户确定的主体以外，画面里的所有内容都要完整还原并写进 prompt：新增人物、女性/男性/儿童、宠物、道具、车辆、建筑、背景地标、灯光、天气、文字牌匾、树叶、地面、构图、滤镜、氛围等。非主体元素都要当作 AI 在 prompt 里新生成或固定复现的模板内容，不要写成第二张照片或原本合照。
-9. 对于被 AI 新增的人物，必须像锁定角色设定一样还原她/他在参考图里的所有关键细节：性别、年龄段、肤色、人种/地域气质、脸型气质、发型、头发颜色、身材比例、上衣、外套、裤子/裙子、鞋子、包包、配饰、姿势、站位、表情、视线、和主体的互动关系。尤其是情侣感画面，如果主体是男性，女性通常是 prompt 生成出来的角色，要写“generate/add a beautiful young Southeast Asian woman beside him”，并保留她的年轻东南亚女孩气质、浅暖肤色、甜美脸型、长红色卷发、白色抹胸/短上衣、米色针织开衫、浅蓝刺绣宽松牛仔裤、白色鞋、斜挎包、微笑看向男性等细节。
-10. 场景必须细写，尤其是参考图中后面的牌匾、招牌、门楼、柱子、可见文字和背景层次。能看清文字时要尽量写出文字内容和样式；看不准时也要写出“large cream/white Japanese/Chinese characters on a dark wooden plaque / 黑色木牌匾上的大号白色汉字/日文字符”。要描述牌匾在画面顶部、木质寺庙门框、两侧柱子、入口深处、台阶、长椅、树叶绿植、背景虚化游客、石板或浅色地面等可见元素。
+9. 对于被 AI 新增的人物，必须像锁定角色设定一样还原她/他在参考图里的所有关键细节：性别、年龄段、肤色、人种/地域气质、脸型气质、发型、头发颜色、身材比例、上衣、外套、裤子/裙子、鞋子、包包、配饰、姿势、站位、表情、视线、和主体的互动关系。尤其是情侣感画面，如果主体是男性，女性通常是 prompt 生成出来的角色，要写“generate/add a beautiful young Southeast Asian woman beside him”，并保留她的年轻东南亚女孩气质、浅暖肤色、甜美脸型、长酒红/樱桃红/burgundy red 波浪卷发、深红挑染层次、白色抹胸/短上衣、米色针织开衫、浅蓝刺绣宽松牛仔裤、白色鞋、斜挎包、微笑看向男性等细节。发色不要只写 red hair，要尽量写 burgundy/cherry red/dark crimson red wavy hair。
+10. 场景必须细写，尤其是参考图中后面的牌匾、招牌、门楼、柱子、可见文字、灯笼文字和背景层次。能看清文字时要尽量写出文字内容和样式；看不准时也要写出“large cream/gold Japanese/Chinese characters on a dark wooden plaque / 黑色木牌匾上的大号金色或奶白色汉字/日文字符”。如果有两个牌匾或多处文字，必须分别写：顶部横向黑色木牌匾、右侧竖向木牌匾、中央红色灯笼上的黑色大字。要描述牌匾在画面顶部、右侧竖牌、木质寺庙门框、两侧柱子、入口深处、台阶、长椅、树叶绿植、背景虚化游客、石板或浅色地面等可见元素。
 11. 必须保留参考图最显眼、最可能来自原 prompt 的词：主体动作、人物互动、场景、背景地标、牌匾文字、关键道具、屏幕/海报/车辆/灯笼等元素、AI 新增角色的造型细节、真实电影感滤镜。不要描述可替换主体的旧照片穿搭，也不要忽略主体以外的任何重要细节。
 12. 不要强行加入“low-angle、dust、smoke、dark gritty environment、high contrast、poster style”等泛化词，除非它们是画面核心且原 prompt 很可能会写。
 13. 人物替换方式：ChatGPT 版可以写“photo from the first image / 上传的第一张照片”；Hypic 版可以写“uploaded photo subject / 上传照片人物”。重点是让用户上传自己的照片后能套用。
@@ -92,11 +92,11 @@ function buildInstruction() {
 generate a dramatic photo realistic scene of this guy in stylish jeans and green scarf clothes photo from the first image confidently walking out of a giant smartphone screen, the phone screen resembles a tiktok profile with the username, the glass of the phone is shattered with shards flying outward creating a dynamic cinematic filter
 
 强参考示例，遇到类似“上传男性照片 + AI 生成女性站在旁边”的情侣旅行图时，不要写成情侣合照，要接近这种：
-generate a realistic photo of the man from the first image walking hand in hand with a beautiful young Southeast Asian woman beside him, standing on the left and looking at her, the woman has warm light skin, sweet face, long wavy deep red hair with bangs, slim body, smiling and looking at the man, wearing a white cropped tube top, beige knitted cardigan, light blue wide jeans with subtle floral embroidery, white shoes and a brown crossbody bag, couple travel style in front of an old Japanese temple wooden gate, large dark wooden plaque at the top with big cream Japanese characters, side wooden pillars with vertical white characters, green trees, stone path, soft blurred tourists and stairs in the background, natural daylight, romantic cinematic realistic filter
+generate a realistic photo of the man from the first image walking hand in hand with a beautiful young Southeast Asian woman beside him, standing on the left and looking at her, the woman has warm light skin, sweet face, long wavy burgundy cherry red hair with darker crimson layers and bangs, slim body, smiling and looking at the man, wearing a white cropped tube top, beige knitted cardigan, light blue wide jeans with subtle floral embroidery, white shoes and a brown crossbody bag, couple travel style in front of an old Japanese temple wooden gate, top black wooden plaque with large gold Japanese characters, right vertical wooden sign with white characters like 浅草寺, huge red lantern behind them with bold black kanji, green leaves above, stone path, wooden pillars, soft blurred tourists and temple stairs in the background, natural daylight, romantic cinematic realistic filter
 
 如果用户确定“图片中的男性”为主体，错误写法是描述男性的卷发、肤色、白色 T 恤、黑色工装裤、球鞋；正确写法是只写 man from the first image walking hand in hand, standing on the left, looking at the woman，然后完整写女性和寺庙场景的细节。
 
-如果图里有牌匾或可见文字，输出不能只写 temple gate / street background，必须写出牌匾的位置、底色、字的颜色、字的大致内容或“large Japanese characters”，以及周围木柱、门框、树叶、台阶、地面和背景人物。
+如果图里有牌匾、灯笼或可见文字，输出不能只写 temple gate / street background，必须写出每一处文字元素的位置、底色、字的颜色、字的大致内容或“large Japanese characters”。例如：顶部黑底金字横牌、右侧木牌白色竖字“浅草寺”、中央红色大灯笼黑色大字，以及周围木柱、门框、树叶、台阶、地面和背景人物。
 
 输出必须是 JSON，不要 Markdown，不要代码块：
 {
