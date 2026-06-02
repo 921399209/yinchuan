@@ -124,6 +124,9 @@ function buildCaptionInstruction() {
   const languages = getSelectedCaptionLanguages();
   if (!languages.length) languages.push("印尼语");
   const languageText = languages.join("、");
+  const languageCount = languages.length;
+  const totalCaptionBudget = 850;
+  const perLanguageBudget = Math.max(120, Math.floor(totalCaptionBudget / languageCount));
   const type = els.copyTypeSelect.value;
   const subject = els.subjectInput.value.trim() || "按图片主体判断";
 
@@ -133,6 +136,9 @@ function buildCaptionInstruction() {
 - 图片主体：${subject}
 - 文案类型：${type === "all" ? "全部生成" : type}
 - 选中的文案语言：${languageText}
+- 语言数量：${languageCount}
+- 每个非空文案字段总长度目标：约 ${totalCaptionBudget} 个字符，不要因为语言数量增加而整体变长
+- 每个语言段长度目标：约 ${perLanguageBudget} 个字符，语言越多每段越短
 
 文案必须模仿这种结构：
 1. 平台标签可放在开头，尤其是 CapCut/Hypic 类文案，像 TikTok 爆款文案一样先吃平台流量。
@@ -151,18 +157,21 @@ function buildCaptionInstruction() {
 写作要求：
 - 如果文案类型是全部生成，就三个字段都输出完整文案。
 - 如果只选择某一种类型，仍然输出 JSON 三个字段，但未选择的字段填空字符串。
-- 如果选择了多种语言，每一个非空字段都必须按照所有选中语言分别生成完整文案。格式用英文语言标签分隔，例如：
+- 长度控制是最高优先级之一：选择 1 个语言和选择 5 个语言时，每个非空字段的总字符数必须接近，不要按语言数量成倍增长。
+- 如果只选择 1 个语言，该语言可以写得完整一些；如果选择多个语言，每个语言段必须明显缩短，只保留钩子、核心 SEO 关键词、同款效果描述、极短教程。
+- 如果选择了多种语言，每一个非空字段都必须按照所有选中语言分别生成短文案。格式用英文语言标签分隔，例如：
   [Indonesian]
-  完整印尼语文案
+  短印尼语文案
 
   [Thai]
-  完整泰语文案
+  短泰语文案
   选择几种语言就输出几段，不要漏掉任何一种语言。
-- 每个文案必须是可直接复制到 TikTok 的完整发布文案。
+- 每个非空字段必须是可直接复制到 TikTok 的完整发布文案，但总长度必须控制在约 ${totalCaptionBudget} 字符。
 - 文案整体要像 TikTok 达人主页里的爆款 SEO 长文案，不要像普通广告文案；允许关键词重复、短语堆叠、教程句反复变体。
 - 根据每个所选语言分别输出主体内容；如果图片风格适合跨区流量，可以少量混入 English AI/search keywords，但每段主体语言必须保持为该段对应语言。
 - CapCut 拉失活文案要更直接地召回用户打开 CapCut，例如强调“现在就打开 CapCut”“这个模板别错过”“用旧照片也能做同款”。
-- hashtag 要少而准：Hypic 文案固定 4 个强制标签后最多再加 1 个；CapCut 文案固定 2 个强制标签后最多再加 3 个；CapCut 拉失活文案固定 3 个强制标签后最多再加 2 个。
+- hashtag 要少而准，并且每个字段只在最后统一放一组 hashtag，不要在每个语言段重复放标签。Hypic 文案固定 4 个强制标签后最多再加 1 个；CapCut 文案固定 2 个强制标签后最多再加 3 个；CapCut 拉失活文案固定 3 个强制标签后最多再加 2 个。
+- 不要为了凑字数写太长。多语言时优先压缩 SEO 关键词堆叠和教程句，保证总字符长度稳定。
 - 不要 Markdown，不要解释，不要分代码块。
 - 绝对不要输出中文汉字。当前文案语言选项不包含中文，所以 hypic_caption、capcut_caption、capcut_reactivation_caption 三个字段里都不能出现中文标题、中文解释、中文小节名或中文标签。语言分隔标题也必须用英文，例如 [Indonesian]、[Thai]、[Russian]。
 - 不要编造真实姓名，图片里看不清身份时用通用称呼。
