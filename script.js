@@ -77,19 +77,20 @@ function buildInstruction() {
 3. 英文通常控制在 35-85 个词，中文通常控制在 45-120 个汉字；如果画面里有 AI 新增人物，允许稍微更长一点来写清她/他的头发、穿搭、配饰和互动，但仍然要像原始 prompt，不能变成长篇摄影分析。
 4. 英文要尽量使用这种原始句式：generate a realistic/photo realistic scene of this guy/girl/person from the first image..., add/generate..., standing beside him..., walking hand in hand..., in front of..., cinematic realistic filter。只有遇到手机破屏图时才使用 walking out of giant smartphone screen、TikTok profile、shattered glass 这一类句式。
 5. 中文也要像直译的生图提示词，不要变成长篇专业描述。
-6. “你的照片主体”是强控制条件：如果用户写了“图片中的男性/左边男性/这个男人/主体男生”，就只能把这个男性写成 from the first image / 上传照片里的男性；同一画面里的女性、儿童、宠物、道具、车辆等都要当作 AI 在 prompt 里新生成的对象，不要写成原本合照或第二张照片。
-7. 对于被 AI 新增的人物，必须还原她/他在参考图里的核心细节：性别、发型、头发颜色、上衣、外套、裤子/裙子、鞋子、包包、姿势、站位、表情、和主体的互动关系。尤其是情侣感画面，女性通常是 prompt 生成出来的角色，要写“generate/add a beautiful woman beside him”，并保留她的红色长发、白色抹胸、米色针织外套、浅蓝牛仔裤、斜挎包等可见特征。
-8. 必须保留参考图最显眼、最可能来自原 prompt 的词：主体服装/造型、动作、场景、背景地标、关键道具、屏幕/海报/车辆/灯笼等元素、人物互动、动态电影感滤镜。不要只保留主体，忽略新增角色的细节。
-9. 不要强行加入“low-angle、dust、smoke、dark gritty environment、high contrast、poster style”等泛化词，除非它们是画面核心且原 prompt 很可能会写。
-10. 人物替换方式：ChatGPT 版可以写“photo from the first image / 上传的第一张照片”；Hypic 版可以写“uploaded photo subject / 上传照片人物”。重点是让用户上传自己的照片后能套用。
-11. 如果画面有可识别平台样式，可以写 TikTok profile / 短视频主页；如果有真实用户名，不要复制具体用户名，写 with the username / 带用户名区域 即可。
-12. 禁止输出负面提示词、同款变体、解释说明。
+6. “你的照片主体”是强控制条件：如果用户写了“图片中的男性/左边男性/这个男人/主体男生”，就只能把这个男性写成 man from the first image / 上传照片里的男性；绝对不要描述这个可替换主体的脸、发型、肤色、年龄、身材、衣服、裤子、鞋子、配饰、文字 logo 等外貌和穿搭细节，因为用户会重新上传另一张男性照片，这些细节应由新照片自己决定。
+7. 对可替换主体只保留动作、姿势、站位和互动关系，例如 walking, standing on the left, holding hands, looking at the woman, walking beside her。主体的动作可以写，主体的外貌和衣服不要写。
+8. 同一画面里的女性、儿童、宠物、道具、车辆等非主体元素都要当作 AI 在 prompt 里新生成的对象，不要写成原本合照或第二张照片。对于被 AI 新增的人物，必须还原她/他在参考图里的核心细节：性别、发型、头发颜色、上衣、外套、裤子/裙子、鞋子、包包、姿势、站位、表情、和主体的互动关系。尤其是情侣感画面，女性通常是 prompt 生成出来的角色，要写“generate/add a beautiful woman beside him”，并保留她的红色长发、白色抹胸、米色针织外套、浅蓝牛仔裤、斜挎包等可见特征。
+9. 必须保留参考图最显眼、最可能来自原 prompt 的词：主体动作、人物互动、场景、背景地标、关键道具、屏幕/海报/车辆/灯笼等元素、AI 新增角色的造型细节、动态电影感滤镜。不要描述可替换主体的旧照片穿搭，也不要忽略新增角色的细节。
+10. 不要强行加入“low-angle、dust、smoke、dark gritty environment、high contrast、poster style”等泛化词，除非它们是画面核心且原 prompt 很可能会写。
+11. 人物替换方式：ChatGPT 版可以写“photo from the first image / 上传的第一张照片”；Hypic 版可以写“uploaded photo subject / 上传照片人物”。重点是让用户上传自己的照片后能套用。
+12. 如果画面有可识别平台样式，可以写 TikTok profile / 短视频主页；如果有真实用户名，不要复制具体用户名，写 with the username / 带用户名区域 即可。
+13. 禁止输出负面提示词、同款变体、解释说明。
 
 强参考示例，遇到类似“人物走出巨大手机屏幕、TikTok 主页、玻璃碎裂”的图时，英文应该接近这种，而不是专业改写：
 generate a dramatic photo realistic scene of this guy in stylish jeans and green scarf clothes photo from the first image confidently walking out of a giant smartphone screen, the phone screen resembles a tiktok profile with the username, the glass of the phone is shattered with shards flying outward creating a dynamic cinematic filter
 
 强参考示例，遇到类似“上传男性照片 + AI 生成女性站在旁边”的情侣旅行图时，不要写成情侣合照，要接近这种：
-generate a realistic photo of the man from the first image walking hand in hand with a beautiful red hair woman beside him, she wears a white tube top, beige knit cardigan, light blue wide jeans and crossbody bag, couple style in front of a Japanese temple gate with big red lantern, looking at each other, romantic travel photo, cinematic realistic filter
+generate a realistic photo of the man from the first image walking hand in hand with a beautiful red hair woman beside him, standing on the left and looking at her, she wears a white tube top, beige knit cardigan, light blue wide jeans with floral embroidery and crossbody bag, couple style in front of a Japanese temple gate with big red lantern, romantic travel photo, cinematic realistic filter
 
 输出必须是 JSON，不要 Markdown，不要代码块：
 {
