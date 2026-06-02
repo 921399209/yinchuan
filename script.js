@@ -81,7 +81,7 @@ async function loadServerConfig() {
 function buildInstruction() {
   return `Analyze the uploaded image as if you are reconstructing the original text-to-image prompt.
 
-Generate a highly detailed English prompt that could recreate an image extremely close to the reference. Accuracy is more important than brevity.
+Generate a concise but accurate prompt that could recreate an image extremely close to the reference. Keep the wording compact; quality and key visual consistency matter more than long descriptions.
 
 Focus on: subject, pose, facial expression, clothing, environment, composition, camera angle, lens, lighting, color palette, texture, material, artistic style, rendering style, mood, depth of field, background details, realism level, and image quality.
 
@@ -99,24 +99,19 @@ If the image looks AI-generated, infer the likely prompt style and parameters.
 Additional reconstruction rules:
 1. Output two complete bundled prompt blocks: one in Chinese and one in English.
 2. Each bundled prompt block must include Main Prompt, Negative Prompt, Suggested Model / Style, and Suggested Parameters together in one text. Do not split them into separate UI fields.
-3. The Main Prompt must be a single highly detailed prompt, not an explanation. It may be long if needed for accuracy.
-4. Preserve visible details aggressively: subject, pose, expression, clothing, environment, composition, camera angle, lens feeling, lighting, color palette, textures, material, style, rendering, mood, depth of field, background details, realism, and image quality.
-5. Only one thing may change: the selected person's identity/face from the user's selfie. Everything else visible must match the effect image as closely as possible: facial expression, eye gaze direction, head angle, body pose, hands, legs, clothing, outfit colors, hairstyle silhouette, accessories, lighting, camera angle, composition, background, props, text, and atmosphere.
-6. The Main Prompt must explicitly reconstruct the camera and composition: vertical/horizontal framing, full body/half body/close-up, low angle/high angle/eye-level, centered or off-center placement, foreground/midground/background layering, lens feel, perspective distortion, crop, and depth of field.
-7. The Main Prompt must explicitly reconstruct light and shadow: main light direction, rim light, backlight, soft or hard shadows, highlights, reflections, glow, contrast level, exposure, color temperature, haze, smoke, dust, or volumetric light if visible.
-8. The Main Prompt must explicitly reconstruct scene details: background architecture, signs, plaques, readable or approximate text, screen UI, props, ground texture, furniture, plants, weather, particles, broken glass, fabric texture, metal, skin, hair, and any visible material details.
-9. The Main Prompt must state the exact gaze direction and eye target. Examples: eyes looking left, looking to the upper right, looking down at the ground, looking directly at camera, looking at the woman beside him. If the effect image looks left, the prompt must say looking left. If the eyes look away from camera, the prompt must say away from camera.
-10. The Main Prompt must explicitly reconstruct the exact pose and action: body direction, head angle, gaze direction, hand/arm/leg placement, walking or standing motion, interaction with objects or other people, and the subject's position in the frame.
-11. Avoid generic filler unless it is visibly true. Do not rely only on phrases like cinematic, high quality, ultra realistic, dramatic lighting, or detailed background. Every style word should be tied to a visible detail.
-12. For the selected subject in “你的照片主体”, do not describe the old facial identity, exact facial features, old skin tone, old face shape, or old personal identity. Instead write that the face/identity should come from the uploaded selfie/photo, while the facial expression, eye direction, head angle, pose, clothing, outfit colors, accessories, hair styling seen in the effect, body posture, and scene must remain the same as the effect image.
-13. Lock the effect image's subject styling unless the user explicitly chooses a clothing-replacement strategy: clothing type, clothing color, fabric, shoes, accessories, hairstyle shape, eye gaze, expression, and body action should be described as fixed visual targets. If hands, arms, legs, or body shape are visible, describe their position and gesture accurately.
-14. Everything outside the selected subject's identity must be locked in detail. If there is an AI-generated companion/person, describe their age range, ethnicity or regional look, skin tone, facial vibe, hair color, hairstyle, body type, outfit, shoes, bag, accessories, expression, pose, position, gaze, and interaction.
-15. If visible text, plaques, lanterns, signs, usernames, screens, posters, storefronts, or interface elements appear, describe their position, color, material, typography style, and readable or approximate text. Do not omit sign text.
-16. If the image has a raw viral prompt style, infer that style but keep the final Main Prompt precise and usable.
-17. Negative Prompt must be practical and image-specific, including wrong face identity, changed expression, wrong gaze direction, eyes looking the wrong way, wrong head angle, wrong pose, changed clothing, wrong camera angle, wrong lighting direction, missing background details, unreadable text, changed outfit on non-replaceable characters, and missing visible props when relevant.
-18. Suggested Model / Style should name suitable model families or generation modes, for example GPT image generation, Midjourney realistic/editorial, Flux photoreal, cinematic composite, fashion editorial, or product render, based on the image.
-19. Suggested Parameters should include useful settings such as aspect ratio, lens/camera feel, quality/detail, stylize/style strength, CFG, steps, seed consistency, and any image-reference strength guidance. Use generic parameters when platform-specific settings are uncertain.
-20. Return JSON only. No Markdown, no code block.
+3. Keep the Main Prompt compact: English about 90-160 words, Chinese about 120-220 Chinese characters. If the image has many important signs, people, or props, you may be slightly longer, but remove repeated adjectives and generic filler.
+4. Preserve only the visual details that affect similarity: subject identity replacement, exact pose/action, facial expression, gaze direction, outfit, key props, scene, camera angle, lighting, color tone, material/texture, and visible text/signs.
+5. Only one thing may change: the selected person's identity/face from the user's selfie. Everything else visible should match the effect image: expression, eye gaze direction, head angle, body pose, hands, legs, clothing, outfit colors, hairstyle silhouette, accessories, lighting, camera angle, composition, background, props, text, and atmosphere.
+6. The Main Prompt must state exact gaze direction and eye target in a short phrase, such as eyes looking left, looking down, looking at camera, or looking at the woman beside him.
+7. The Main Prompt must mention camera/composition and lighting in short phrases, such as vertical full-body low angle, eye-level close-up, soft left side light, strong rim light, wet ground reflections, smoky backlight.
+8. Do not rely on long lists of generic quality words. Use at most a few quality/style words, tied to visible details.
+9. For the selected subject in “你的照片主体”, do not describe old facial identity or exact old facial features. Write that the face/identity comes from the uploaded selfie/photo while expression, gaze, pose, outfit, styling, and scene remain the same as the effect image.
+10. Everything outside the selected subject's identity must be locked but concise. For AI-generated companions, include age/ethnicity vibe, hair color/style, outfit, pose, expression, gaze, and interaction only if visible.
+11. If visible text, plaques, lanterns, signs, usernames, screens, posters, storefronts, or interface elements appear, describe only the important readable/approximate text, position, and color/material.
+12. Negative Prompt must be one compact line, image-specific, including wrong face identity, changed expression, wrong gaze direction, wrong pose, changed clothing, wrong camera angle, wrong lighting, missing details, unreadable text, watermark, low quality.
+13. Suggested Model / Style must be one short line.
+14. Suggested Parameters must be one short line with aspect ratio, quality/detail, style strength, image-reference strength, and seed consistency when useful.
+15. Return JSON only. No Markdown, no code block.
 
 输出必须是 JSON，不要 Markdown，不要代码块：
 {
