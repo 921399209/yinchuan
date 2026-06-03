@@ -149,6 +149,15 @@
               生图提示词
               <textarea id="imagePromptInput" spellcheck="false" placeholder="可以粘贴上面的英文模板，或自己修改后调用 gpt-image-2 生成图片"></textarea>
             </label>
+            <label>
+              图片尺寸
+              <select id="imageAspectRatioInput">
+                <option value="9:16">9:16</option>
+                <option value="1:1">1:1</option>
+                <option value="4:3">4:3</option>
+                <option value="16:9">16:9</option>
+              </select>
+            </label>
             <div class="image-actions">
               <button class="ghost-button" id="generateImageButton" type="button">调用 gpt-image-2 生图</button>
               <span class="field-hint" id="imageGenerationStatus"></span>

@@ -20,6 +20,7 @@ const els = {
   chatgptCnOutput: document.querySelector("#chatgptCnOutput"),
   chatgptEnOutput: document.querySelector("#chatgptEnOutput"),
   imagePromptInput: document.querySelector("#imagePromptInput"),
+  imageAspectRatioInput: document.querySelector("#imageAspectRatioInput"),
   generationImageInput: document.querySelector("#generationImageInput"),
   generationPreviewWrap: document.querySelector("#generationPreviewWrap"),
   generationPreviewImage: document.querySelector("#generationPreviewImage"),
@@ -417,6 +418,7 @@ async function generateTikTokCaptions() {
 async function generateImageWithGptImage2() {
   const apiKey = els.apiKeyInput.value.trim();
   const prompt = els.imagePromptInput.value.trim() || els.chatgptEnOutput.value.trim();
+  const aspectRatio = els.imageAspectRatioInput.value;
 
   if (!apiKey && !imageKeyConfigured) {
     setStatus("缺少 API Key", "error");
@@ -455,7 +457,7 @@ async function generateImageWithGptImage2() {
         apiKey,
         model: IMAGE_MODEL,
         image: state.generationImageDataUrl,
-        prompt,
+        prompt: `${prompt}\n\nImage aspect ratio: ${aspectRatio}. Keep the composition optimized for ${aspectRatio}.`,
       }),
     });
 
