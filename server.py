@@ -5,9 +5,15 @@ import urllib.error
 import urllib.request
 
 
-API_BASE_URL = "https://www.lxc.lt/v1"
-CHAT_COMPLETIONS_URL = f"{API_BASE_URL}/chat/completions"
-MODELS_URL = f"{API_BASE_URL}/models"
+DEFAULT_API_BASE_URL = "https://weibo.com.de/v1"
+
+
+def _base_url_from_env(*names):
+    for name in names:
+        value = os.environ.get(name, "").strip()
+        if value:
+            return value.rstrip("/")
+    return DEFAULT_API_BASE_URL
 
 
 class Handler(SimpleHTTPRequestHandler):
@@ -20,7 +26,7 @@ class Handler(SimpleHTTPRequestHandler):
                 {
                     "serverKeyConfigured": bool(prompt_api_key),
                     "imageKeyConfigured": bool(image_api_key),
-                    "defaultModel": os.environ.get("LXC_MODEL", os.environ.get("CCCJIN_MODEL", "gpt-5.5")),
+                    "defaultModel": self._default_prompt_model(),
                 },
             )
             return
@@ -43,7 +49,7 @@ class Handler(SimpleHTTPRequestHandler):
             length = int(self.headers.get("Content-Length", "0"))
             data = json.loads(self.rfile.read(length).decode("utf-8"))
             api_key = self._resolve_api_key(data)
-            model = data.get("model", "").strip() or os.environ.get("LXC_MODEL", os.environ.get("CCCJIN_MODEL", "gpt-5.5"))
+            model = data.get("model", "").strip() or self._default_prompt_model()
             image = data["image"]
             prompt = data["prompt"]
 
@@ -62,7 +68,7 @@ class Handler(SimpleHTTPRequestHandler):
             }
 
             request = urllib.request.Request(
-                CHAT_COMPLETIONS_URL,
+                self._prompt_chat_completions_url(),
                 data=json.dumps(upstream_body).encode("utf-8"),
                 headers={
                     "Authorization": f"Bearer {api_key}",
@@ -100,7 +106,7 @@ class Handler(SimpleHTTPRequestHandler):
             }
 
             request = urllib.request.Request(
-                CHAT_COMPLETIONS_URL,
+                self._image_chat_completions_url(),
                 data=json.dumps(upstream_body).encode("utf-8"),
                 headers={
                     "Authorization": f"Bearer {api_key}",
@@ -128,7 +134,7 @@ class Handler(SimpleHTTPRequestHandler):
             api_key = self._resolve_api_key(data)
 
             request = urllib.request.Request(
-                MODELS_URL,
+                self._prompt_models_url(),
                 headers={"Authorization": f"Bearer {api_key}"},
                 method="GET",
             )
@@ -174,6 +180,24 @@ class Handler(SimpleHTTPRequestHandler):
 
     def _server_image_api_key(self):
         return os.environ.get("LXC_IMAGE_API_KEY", "").strip()
+
+    def _default_prompt_model(self):
+        return os.environ.get("LXC_MODEL", os.environ.get("CCCJIN_MODEL", "gpt5.5"))
+
+    def _prompt_api_base_url(self):
+        return _base_url_from_env("PROMPT_API_BASE_URL", "API_BASE_URL", "LXC_API_BASE_URL", "CCCJIN_API_BASE_URL")
+
+    def _image_api_base_url(self):
+        return _base_url_from_env("IMAGE_API_BASE_URL", "API_BASE_URL", "LXC_API_BASE_URL", "CCCJIN_API_BASE_URL")
+
+    def _prompt_chat_completions_url(self):
+        return f"{self._prompt_api_base_url()}/chat/completions"
+
+    def _image_chat_completions_url(self):
+        return f"{self._image_api_base_url()}/chat/completions"
+
+    def _prompt_models_url(self):
+        return f"{self._prompt_api_base_url()}/models"
 
     def _read_http_error(self, error):
         detail = error.read().decode("utf-8", errors="replace")

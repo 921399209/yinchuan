@@ -15,7 +15,9 @@ http://127.0.0.1:8787/
 ```bash
 LXC_API_KEY=提示词和文案使用的 lxc API Key
 LXC_IMAGE_API_KEY=gpt-image-2 作图使用的 lxc API Key
-LXC_MODEL=gpt-5.5
+PROMPT_API_BASE_URL=https://weibo.com.de/v1
+IMAGE_API_BASE_URL=https://weibo.com.de/v1
+LXC_MODEL=gpt5.5
 HOST=0.0.0.0
 PORT=8787
 ```

@@ -1,4 +1,4 @@
-﻿const state = {
+const state = {
   imageDataUrl: "",
   fileName: "",
   generationImageDataUrl: "",
@@ -46,8 +46,8 @@ const els = {
 
 let serverKeyConfigured = false;
 let imageKeyConfigured = false;
-const FIXED_MODEL = "gpt-5.5";
-const FIXED_MODEL_LABEL = "GPT-5.5";
+const FIXED_MODEL = "gpt5.5";
+const FIXED_MODEL_LABEL = "GPT5.5";
 const IMAGE_MODEL = "gpt-image-2";
 
 function setStatus(text, tone = "idle") {
@@ -70,7 +70,7 @@ async function loadServerConfig() {
       els.apiKeyField.hidden = true;
       els.apiKeyField.style.display = "none";
       els.apiHint.textContent = imageKeyConfigured
-        ? `站点已配置提示词 Key 和作图 Key，接口统一走 www.lxc.lt/v1，提示词固定使用 ${FIXED_MODEL_LABEL}，作图固定使用 ${IMAGE_MODEL}。`
+        ? `站点已配置提示词 Key 和作图 Key，提示词固定使用 ${FIXED_MODEL_LABEL}，作图固定使用 ${IMAGE_MODEL}。`
         : `站点已配置提示词 Key。作图功能如需单独 Key，请在 Render 添加 LXC_IMAGE_API_KEY。`;
       setStatus("站点已配置", "ok");
     }
@@ -255,10 +255,10 @@ function readableError(errorText) {
     return `${FIXED_MODEL_LABEL} 或上游通道临时不可用，请稍后重试。`;
   }
   if (/Unauthorized|invalid api key|401/i.test(text)) {
-    return "API Key 无效或没有权限，请检查 www.lxc.lt 后台生成的 Key。";
+    return "API Key 无效或没有权限，请检查第三方接口后台生成的 Key。";
   }
   if (/forbidden|access denied|permission|no access|没有权限|拒绝访问/i.test(text)) {
-    return "LXC 上游通道拒绝访问图片输入，请检查 www.lxc.lt 后台的 Key、令牌分组、模型通道权限或联系接口平台管理员。";
+    return "第三方上游通道拒绝访问图片输入，请检查后台 Key、令牌分组、模型通道权限或联系接口平台管理员。";
   }
   if (/model|not found|unsupported/i.test(text)) {
     return "模型名不可用或不支持图片输入，请换用后台可用的视觉模型。";
