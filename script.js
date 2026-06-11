@@ -257,6 +257,9 @@ function readableError(errorText) {
   if (/Unauthorized|invalid api key|401/i.test(text)) {
     return "API Key 无效或没有权限，请检查 www.lxc.lt 后台生成的 Key。";
   }
+  if (/forbidden|access denied|permission|no access|没有权限|拒绝访问/i.test(text)) {
+    return "LXC 上游通道拒绝访问图片输入，请检查 www.lxc.lt 后台的 Key、令牌分组、模型通道权限或联系接口平台管理员。";
+  }
   if (/model|not found|unsupported/i.test(text)) {
     return "模型名不可用或不支持图片输入，请换用后台可用的视觉模型。";
   }
