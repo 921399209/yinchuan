@@ -46,8 +46,8 @@ const els = {
 
 let serverKeyConfigured = false;
 let imageKeyConfigured = false;
-const FIXED_MODEL = "gpt-5.5";
-const FIXED_MODEL_LABEL = "GPT5.5";
+const FIXED_MODEL = "gpt-5.4";
+const FIXED_MODEL_LABEL = "GPT5.4";
 const IMAGE_MODEL = "gpt-image-2";
 
 function setStatus(text, tone = "idle") {
