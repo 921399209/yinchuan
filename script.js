@@ -46,7 +46,7 @@ const els = {
 
 let serverKeyConfigured = false;
 let imageKeyConfigured = false;
-const FIXED_MODEL = "gpt5.5";
+const FIXED_MODEL = "gpt-5.5";
 const FIXED_MODEL_LABEL = "GPT5.5";
 const IMAGE_MODEL = "gpt-image-2";
 
@@ -606,5 +606,4 @@ document.querySelectorAll(".copy-one").forEach((button) => {
     copyText(target.value, button, "复制");
   });
 });
-
 
