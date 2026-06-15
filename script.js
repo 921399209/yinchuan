@@ -142,9 +142,9 @@ function buildCaptionInstruction() {
   const englishSelected = languages.includes("英语");
   const englishRule = englishSelected
     ? `英语已被选择，所以英语只能占全部正文约 1 / ${languageCount}，不能超过其他语言。`
-    : "英语没有被选择，所以正文里禁止出现英语句子、英语 SEO 关键词、English hook、tutorial/trend/prompt/search keywords 等英文普通词；只允许保留 TikTok、AI、ChatGPT、Gemini、CapCut、Hypic 这类品牌/产品名和最后的强制 hashtag。";
+    : "英语没有被选择，所以正文里禁止出现任何英语句子、英语单词、英语缩写、英文教程词、英文搜索词、英文品牌名；只允许在最终 hashtag 区保留平台强制话题。";
 
-  return `你是一个 TikTok 短视频文案生成器。请根据用户上传的图片，生成适合 TikTok 发布的长文案。文案语言必须只使用这些已选语言：${languageText}。只生成一条可直接发布的混合语言文案，不要按语言拆成多个版本。
+  return `你是一个 TikTok 短视频文案生成器。请根据用户上传的图片，生成适合 TikTok 发布的长文案。文案语言必须严格只使用这些已选语言：${languageText}。只生成一条可直接发布的混合语言文案，不要按语言拆成多个版本。
 
 用户补充：
 - 图片主体：${subject}
@@ -152,7 +152,7 @@ function buildCaptionInstruction() {
 - 选中的文案语言：${languageText}
 - 语言数量：${languageCount}
 - 每个非空文案字段总长度目标：约 ${totalCaptionBudget} 个字符，不要因为语言数量增加而整体变长
-- 每种语言在同一条文案里的长度目标：约 ${perLanguageBudget} 个字符，所有语言占比必须尽量平均
+- 每种语言在同一条文案里的长度目标：约 ${perLanguageBudget} 个字符，所有语言占比必须尽量平均；如果只选 1 个语言，就只写这一种语言。
 
 语言执行表（必须严格执行，每个非空字段都要覆盖全部已选语言）：
 ${selectedLanguageRules}
@@ -180,14 +180,14 @@ ${selectedLanguageRules}
 - 如果只选择某一种类型，仍然输出 JSON 三个字段，但未选择的字段填空字符串。
 - 长度控制是最高优先级之一：选择 1 个语言和选择 5 个语言时，每个非空字段的总字符数必须接近，不要按语言数量成倍增长。
 - 如果只选择 1 个语言，该语言可以写得完整一些；如果选择多个语言，必须只生成一条混合语言文案，把所有选中语言写在同一条发布文案里，不要输出多个语言版本。
-- 如果选择了多种语言，每一个非空字段都必须让所有选中语言交替出现。必须按“语言 1 一句、语言 2 一句、语言 3 一句……”的循环方式写，直到每种语言篇幅接近。不能只写其中几种语言，不能让某一种语言明显更多。
+- 如果选择了多种语言，每一个非空字段都必须让所有选中语言交替出现。必须按“语言 1 一句、语言 2 一句、语言 3 一句……”的循环方式写，直到每种语言篇幅接近。不能只写其中几种语言，不能让某一种语言明显更多，不能混入任何未选语言。
 - 不要用 [Indonesian]、[Thai]、[English]、Indonesian:、Malay: 这类语言标题分段，不要按语言拆成独立段落，也不要出现任何国家名、地区名、语言名、国家/语言标题。
-- 多语言占比是最高优先级：每种语言的字符量必须接近 1 / ${languageCount}，允许最多约 10% 偏差；所有 SEO 关键词、教程句、自然句都必须分配给各个已选语言，不能把 SEO 部分默认写成英语。
+- 多语言占比是最高优先级：每种语言的字符量必须接近 1 / ${languageCount}，允许最多约 10% 偏差；所有 SEO 关键词、教程句、自然句都必须分配给各个已选语言，不能把 SEO 部分默认写成英语或任何其他未选语言。
 - 推荐混合方式：按所有选中语言各写一句短钩子，再按所有选中语言各写一组本语言 SEO/search keywords，再按所有选中语言各写一句同款效果或极短教程。整体看起来是一条自然的 TikTok 文案，而不是多个翻译版本。
 - 不要重复翻译同一句太多次；每种语言表达同一个卖点即可，句子短、节奏快、适合 TikTok。
 - 每个非空字段必须是可直接复制到 TikTok 的完整发布文案，但总长度必须控制在约 ${totalCaptionBudget} 字符。
 - 文案整体要像 TikTok 达人主页里的爆款 SEO 长文案，不要像普通广告文案；允许关键词重复、短语堆叠、教程句反复变体。
-- 根据所有所选语言共同输出主体内容；未选择英语时，禁止使用 English AI/search keywords 或英文长尾搜索词。选择英语时，英文也只能按平均份额出现。
+- 根据所有所选语言共同输出主体内容；未选择英语时，正文里不要出现任何英文单词或英文品牌名。选择英语时，英文也只能按平均份额出现。
 - CapCut 拉失活文案要更直接地召回用户打开 CapCut，例如强调“现在就打开 CapCut”“这个模板别错过”“用旧照片也能做同款”。
 - hashtag 要少而准，并且每个字段只在最后统一放一组 hashtag，不要在每个语言段重复放标签。Hypic 文案固定 4 个强制标签后最多再加 1 个；CapCut 文案固定 2 个强制标签后最多再加 3 个；CapCut 拉失活文案固定 3 个强制标签后最多再加 2 个。
 - 不要为了凑字数写太长。多语言时优先压缩 SEO 关键词堆叠和教程句，保证总字符长度稳定。
@@ -389,6 +389,18 @@ function stripForbiddenCaptionNames(text) {
     .trim();
 }
 
+function stripUnselectedEnglish(text) {
+  const selectedLanguages = getSelectedCaptionLanguages();
+  if (selectedLanguages.includes("英语")) return String(text || "").trim();
+  return String(text || "")
+    .replace(/\b[A-Za-z][A-Za-z0-9'_-]*\b/g, "")
+    .replace(/\s+([,.;:!?])/g, "$1")
+    .replace(/[ \t]{2,}/g, " ")
+    .replace(/[ \t]+\n/g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
 function stripChineseText(text) {
   const languages = getSelectedCaptionLanguages();
   const allowCjkText = languages.some((language) => ["日语", "韩语"].includes(language));
@@ -549,17 +561,17 @@ async function generateTikTokCaptions() {
 
     const parsed = extractJson(payload.content || "");
     els.hypicCaptionOutput.value = ensureHashtags(
-      stripChineseText(stripForbiddenCaptionNames(stripLanguageHeadings(parsed.hypic_caption))),
+      stripChineseText(stripUnselectedEnglish(stripForbiddenCaptionNames(stripLanguageHeadings(parsed.hypic_caption)))),
       ["#hypic", "#hypiccreator", "#hypicATETHAT", "#Godpic"],
       5,
     );
     els.capcutCaptionOutput.value = ensureHashtags(
-      stripChineseText(stripForbiddenCaptionNames(stripLanguageHeadings(parsed.capcut_caption))),
+      stripChineseText(stripUnselectedEnglish(stripForbiddenCaptionNames(stripLanguageHeadings(parsed.capcut_caption)))),
       ["#capcut", "#capcutpioneer"],
       5,
     );
     els.capcutReactivationCaptionOutput.value = ensureHashtags(
-      stripChineseText(stripForbiddenCaptionNames(stripLanguageHeadings(parsed.capcut_reactivation_caption))),
+      stripChineseText(stripUnselectedEnglish(stripForbiddenCaptionNames(stripLanguageHeadings(parsed.capcut_reactivation_caption)))),
       ["#capcut", "#capcutpioneer", "#capcutnow"],
       5,
     );
