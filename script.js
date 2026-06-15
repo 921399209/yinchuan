@@ -132,8 +132,19 @@ function buildCaptionInstruction() {
   const perLanguageBudget = Math.max(120, Math.floor(totalCaptionBudget / languageCount));
   const type = els.copyTypeSelect.value;
   const subject = els.subjectInput.value.trim() || "按图片主体判断";
+  const selectedLanguageRules = languages.map((language, index) => {
+    const spec = CAPTION_LANGUAGE_SPECS[language] || { nativeName: language, outputRule: `只使用${language}` };
+    return `${index + 1}. ${language}：${spec.nativeName}；${spec.outputRule}；目标长度约 ${perLanguageBudget} 个字符`;
+  }).join("\n");
+  const unselectedLanguages = Object.keys(CAPTION_LANGUAGE_SPECS).filter((language) => !languages.includes(language));
+  const unselectedLanguageText = unselectedLanguages.join("、") || "无";
+  const forbiddenNames = getForbiddenCaptionNames(languages).join("、");
+  const englishSelected = languages.includes("英语");
+  const englishRule = englishSelected
+    ? `英语已被选择，所以英语只能占全部正文约 1 / ${languageCount}，不能超过其他语言。`
+    : "英语没有被选择，所以正文里禁止出现英语句子、英语 SEO 关键词、English hook、tutorial/trend/prompt/search keywords 等英文普通词；只允许保留 TikTok、AI、ChatGPT、Gemini、CapCut、Hypic 这类品牌/产品名和最后的强制 hashtag。";
 
-  return `你是一个 TikTok 短视频文案生成器。请根据用户上传的图片，生成适合 TikTok 发布的长文案。文案语言必须是：${languageText}。
+  return `你是一个 TikTok 短视频文案生成器。请根据用户上传的图片，生成适合 TikTok 发布的长文案。文案语言必须只使用这些已选语言：${languageText}。只生成一条可直接发布的混合语言文案，不要按语言拆成多个版本。
 
 用户补充：
 - 图片主体：${subject}
@@ -141,12 +152,19 @@ function buildCaptionInstruction() {
 - 选中的文案语言：${languageText}
 - 语言数量：${languageCount}
 - 每个非空文案字段总长度目标：约 ${totalCaptionBudget} 个字符，不要因为语言数量增加而整体变长
-- 每个语言段长度目标：约 ${perLanguageBudget} 个字符，语言越多每段越短
+- 每种语言在同一条文案里的长度目标：约 ${perLanguageBudget} 个字符，所有语言占比必须尽量平均
+
+语言执行表（必须严格执行，每个非空字段都要覆盖全部已选语言）：
+${selectedLanguageRules}
+
+禁止使用的未选语言：${unselectedLanguageText}
+禁止在输出文案里出现的国家名、地区名、语言名、标题名：${forbiddenNames}
+英语限制：${englishRule}
 
 文案必须模仿这种结构：
 1. 平台标签可放在开头，尤其是 CapCut/Hypic 类文案，像 TikTok 爆款文案一样先吃平台流量。
 2. 开头一句强钩子：类似“我教你怎么用 AI 做这个 trend，很简单”，要贴合图片效果。
-3. 一大段用户搜索关键词堆叠：不要太规整，要像真实 TikTok SEO 文案，连续重复不同搜索写法，包含 tutorial、trend、prompt、AI、ChatGPT、Gemini、CapCut/Hypic、图片风格词、用户可能搜索的长尾词。
+3. 一大段用户搜索关键词堆叠：不要太规整，要像真实 TikTok SEO 文案，连续重复不同搜索写法。关键词必须翻译成已选语言；未选择英语时，不要写 tutorial、trend、prompt、search keywords 这类英文普通词。AI、ChatGPT、Gemini、CapCut、Hypic 作为品牌/产品名可以保留。
 4. 一段自然文案：解释这个图片效果、画面风格、适合什么人、为什么容易火，可以多用 ✨📸🔥💖✍️ 等符号增强 TikTok 感。
 5. 一段“图片提示词/教程”：告诉用户把自己的照片发给 ChatGPT/Gemini/Hypic/CapCut 后如何生成同款，必须根据图片内容写具体效果。
 6. 一组相关词语：和图片内容、人物、场景、风格、教程、AI 生成有关，可以用 · 或 ｜ 连接。
@@ -161,22 +179,22 @@ function buildCaptionInstruction() {
 - 如果文案类型是全部生成，就三个字段都输出完整文案。
 - 如果只选择某一种类型，仍然输出 JSON 三个字段，但未选择的字段填空字符串。
 - 长度控制是最高优先级之一：选择 1 个语言和选择 5 个语言时，每个非空字段的总字符数必须接近，不要按语言数量成倍增长。
-- 如果只选择 1 个语言，该语言可以写得完整一些；如果选择多个语言，每个语言段必须明显缩短，只保留钩子、核心 SEO 关键词、同款效果描述、极短教程。
-- 如果选择了多种语言，每一个非空字段都必须按照所有选中语言分别生成短文案。格式用英文语言标签分隔，例如：
-  [Indonesian]
-  短印尼语文案
-
-  [Thai]
-  短泰语文案
-  选择几种语言就输出几段，不要漏掉任何一种语言。
+- 如果只选择 1 个语言，该语言可以写得完整一些；如果选择多个语言，必须只生成一条混合语言文案，把所有选中语言写在同一条发布文案里，不要输出多个语言版本。
+- 如果选择了多种语言，每一个非空字段都必须让所有选中语言交替出现。必须按“语言 1 一句、语言 2 一句、语言 3 一句……”的循环方式写，直到每种语言篇幅接近。不能只写其中几种语言，不能让某一种语言明显更多。
+- 不要用 [Indonesian]、[Thai]、[English]、Indonesian:、Malay: 这类语言标题分段，不要按语言拆成独立段落，也不要出现任何国家名、地区名、语言名、国家/语言标题。
+- 多语言占比是最高优先级：每种语言的字符量必须接近 1 / ${languageCount}，允许最多约 10% 偏差；所有 SEO 关键词、教程句、自然句都必须分配给各个已选语言，不能把 SEO 部分默认写成英语。
+- 推荐混合方式：按所有选中语言各写一句短钩子，再按所有选中语言各写一组本语言 SEO/search keywords，再按所有选中语言各写一句同款效果或极短教程。整体看起来是一条自然的 TikTok 文案，而不是多个翻译版本。
+- 不要重复翻译同一句太多次；每种语言表达同一个卖点即可，句子短、节奏快、适合 TikTok。
 - 每个非空字段必须是可直接复制到 TikTok 的完整发布文案，但总长度必须控制在约 ${totalCaptionBudget} 字符。
 - 文案整体要像 TikTok 达人主页里的爆款 SEO 长文案，不要像普通广告文案；允许关键词重复、短语堆叠、教程句反复变体。
-- 根据每个所选语言分别输出主体内容；如果图片风格适合跨区流量，可以少量混入 English AI/search keywords，但每段主体语言必须保持为该段对应语言。
+- 根据所有所选语言共同输出主体内容；未选择英语时，禁止使用 English AI/search keywords 或英文长尾搜索词。选择英语时，英文也只能按平均份额出现。
 - CapCut 拉失活文案要更直接地召回用户打开 CapCut，例如强调“现在就打开 CapCut”“这个模板别错过”“用旧照片也能做同款”。
 - hashtag 要少而准，并且每个字段只在最后统一放一组 hashtag，不要在每个语言段重复放标签。Hypic 文案固定 4 个强制标签后最多再加 1 个；CapCut 文案固定 2 个强制标签后最多再加 3 个；CapCut 拉失活文案固定 3 个强制标签后最多再加 2 个。
 - 不要为了凑字数写太长。多语言时优先压缩 SEO 关键词堆叠和教程句，保证总字符长度稳定。
 - 不要 Markdown，不要解释，不要分代码块。
-- 绝对不要输出中文汉字。当前文案语言选项不包含中文，所以 hypic_caption、capcut_caption、capcut_reactivation_caption 三个字段里都不能出现中文标题、中文解释、中文小节名或中文标签。语言分隔标题也必须用英文，例如 [Indonesian]、[Thai]、[Russian]。
+- 绝对不要输出中文汉字。当前文案语言选项不包含中文，所以 hypic_caption、capcut_caption、capcut_reactivation_caption 三个字段里都不能出现中文标题、中文解释、中文小节名或中文标签。
+- 不要输出语言标题、国家标题或分隔标签，例如 [Indonesian]、[Malay]、[Arabic]、[English]、[Nepali]、Indonesian:、Malay:。正文直接开始写钩子和内容。
+- 正文里不要出现国家名、地区名或语言名，例如 Indonesia、Indonesian、Thailand、Thai、Malaysia、Malay、Cambodia、Khmer、Pakistan、Urdu、Sri Lanka、Sinhala 等；只写对应语言的真实文案内容。
 - 不要编造真实姓名，图片里看不清身份时用通用称呼。
 - 图片提示词要具体到这张图的视觉元素，不能只写“生成同款图片”。
 
@@ -186,6 +204,119 @@ function buildCaptionInstruction() {
   "capcut_caption": "CapCut 完整文案",
   "capcut_reactivation_caption": "CapCut 拉失活完整文案"
 }`;
+}
+
+const CAPTION_LANGUAGE_SPECS = {
+  "印尼语": {
+    nativeName: "Bahasa Indonesia",
+    outputRule: "全部正文用自然印尼语写，不要夹英语普通词",
+    forbiddenNames: ["Indonesia", "Indonesian", "Indonesian language", "Bahasa Indonesia", "印尼", "印度尼西亚", "印尼语"],
+  },
+  "泰语": {
+    nativeName: "ภาษาไทย",
+    outputRule: "全部正文用自然泰语和泰文书写",
+    forbiddenNames: ["Thailand", "Thai", "Thai language", "ประเทศไทย", "ภาษาไทย", "泰国", "泰语"],
+  },
+  "缅甸语": {
+    nativeName: "မြန်မာဘာသာ",
+    outputRule: "全部正文用自然缅甸语和缅文书写",
+    forbiddenNames: ["Myanmar", "Burma", "Burmese", "Burmese language", "မြန်မာ", "缅甸", "缅甸语"],
+  },
+  "马来语": {
+    nativeName: "Bahasa Melayu",
+    outputRule: "全部正文用自然马来语写，不要夹英语普通词",
+    forbiddenNames: ["Malaysia", "Malay", "Malay language", "Bahasa Melayu", "马来西亚", "马来语"],
+  },
+  "越南语": {
+    nativeName: "Tiếng Việt",
+    outputRule: "全部正文用自然越南语书写",
+    forbiddenNames: ["Vietnam", "Vietnamese", "Vietnamese language", "Tiếng Việt", "越南", "越南语"],
+  },
+  "高棉语": {
+    nativeName: "ភាសាខ្មែរ",
+    outputRule: "全部正文用自然高棉语和高棉文书写",
+    forbiddenNames: ["Cambodia", "Cambodian", "Khmer", "Khmer language", "ភាសាខ្មែរ", "柬埔寨", "高棉语"],
+  },
+  "乌尔都语": {
+    nativeName: "اردو",
+    outputRule: "全部正文用自然乌尔都语和乌尔都文书写",
+    forbiddenNames: ["Pakistan", "Pakistani", "Urdu", "Urdu language", "اردو", "巴基斯坦", "乌尔都语"],
+  },
+  "阿拉伯语": {
+    nativeName: "العربية",
+    outputRule: "全部正文用自然阿拉伯语和阿拉伯文书写",
+    forbiddenNames: ["Arab", "Arabic", "Arabic language", "العربية", "阿拉伯", "阿拉伯语"],
+  },
+  "英语": {
+    nativeName: "English",
+    outputRule: "全部正文用自然英语写，但只占平均份额",
+    forbiddenNames: ["English:", "[English]", "英语"],
+  },
+  "俄语": {
+    nativeName: "Русский",
+    outputRule: "全部正文用自然俄语和西里尔字母书写",
+    forbiddenNames: ["Russia", "Russian", "Russian language", "Русский", "俄罗斯", "俄语"],
+  },
+  "尼泊尔语": {
+    nativeName: "नेपाली",
+    outputRule: "全部正文用自然尼泊尔语和天城文书写",
+    forbiddenNames: ["Nepal", "Nepali", "Nepali language", "नेपाली", "尼泊尔", "尼泊尔语"],
+  },
+  "孟加拉语": {
+    nativeName: "বাংলা",
+    outputRule: "全部正文用自然孟加拉语和孟加拉文书写",
+    forbiddenNames: ["Bangladesh", "Bengali", "Bangla", "Bengali language", "বাংলা", "孟加拉", "孟加拉语"],
+  },
+  "僧伽罗语": {
+    nativeName: "සිංහල",
+    outputRule: "全部正文用自然僧伽罗语和僧伽罗文书写",
+    forbiddenNames: ["Sri Lanka", "Sri Lankan", "Sinhala", "Sinhala language", "සිංහල", "斯里兰卡", "僧伽罗语"],
+  },
+  "印地语": {
+    nativeName: "हिन्दी",
+    outputRule: "全部正文用自然印地语和天城文书写",
+    forbiddenNames: ["India", "Indian", "Hindi", "Hindi language", "हिन्दी", "印度", "印地语"],
+  },
+  "菲律宾语": {
+    nativeName: "Filipino",
+    outputRule: "全部正文用自然菲律宾语写，不要夹英语普通词",
+    forbiddenNames: ["Philippines", "Filipino", "Tagalog", "Filipino language", "菲律宾", "菲律宾语"],
+  },
+  "法语": {
+    nativeName: "Français",
+    outputRule: "全部正文用自然法语书写",
+    forbiddenNames: ["France", "French", "French language", "Français", "法国", "法语"],
+  },
+  "日语": {
+    nativeName: "日本語",
+    outputRule: "全部正文用自然日语书写",
+    forbiddenNames: ["Japan", "Japanese", "Japanese language", "日本語", "日本", "日语"],
+  },
+  "韩语": {
+    nativeName: "한국어",
+    outputRule: "全部正文用自然韩语和韩文书写",
+    forbiddenNames: ["Korea", "Korean", "Korean language", "한국어", "韩国", "韩语"],
+  },
+  "德语": {
+    nativeName: "Deutsch",
+    outputRule: "全部正文用自然德语书写",
+    forbiddenNames: ["Germany", "German", "German language", "Deutsch", "德国", "德语"],
+  },
+};
+
+function getForbiddenCaptionNames(selectedLanguages = getSelectedCaptionLanguages()) {
+  const genericNames = [
+    "language", "languages", "country", "countries", "nation", "region",
+    "语言", "国家", "地区",
+    "[Indonesian]", "[Malay]", "[Arabic]", "[English]", "[Nepali]", "[Thai]",
+    "[Burmese]", "[Vietnamese]", "[Khmer]", "[Urdu]", "[Russian]", "[Bengali]",
+    "[Sinhala]", "[Hindi]", "[Filipino]", "[French]", "[Japanese]", "[Korean]", "[German]",
+  ];
+  const selected = new Set(selectedLanguages);
+  const allCountryAndLanguageNames = Object.values(CAPTION_LANGUAGE_SPECS)
+    .flatMap((spec) => spec.forbiddenNames || []);
+  const unselectedLanguageNames = Object.keys(CAPTION_LANGUAGE_SPECS).filter((language) => !selected.has(language));
+  return [...new Set([...genericNames, ...allCountryAndLanguageNames, ...unselectedLanguageNames])].filter(Boolean);
 }
 
 function getSelectedCaptionLanguages() {
@@ -230,6 +361,32 @@ function ensureHashtags(text, requiredTags, maxTags = 5) {
   });
 
   return `${bodyWithoutTags}\n\n${collected.slice(0, maxTags).join(" ")}`.trim();
+}
+
+function stripLanguageHeadings(text) {
+  return String(text || "")
+    .replace(/^\s*\[[^\]\r\n]{2,40}\]\s*$/gm, "")
+    .replace(/^\s*(Indonesian|Malay|Arabic|English|Nepali|Thai|Burmese|Vietnamese|Khmer|Urdu|Russian|Bengali|Sinhala|Hindi|Filipino|French|Japanese|Korean|German)\s*[:：]\s*$/gim, "")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
+function stripForbiddenCaptionNames(text) {
+  let cleaned = String(text || "");
+  getForbiddenCaptionNames().forEach((name) => {
+    const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const pattern = /^[A-Za-z0-9 _-]+$/.test(name)
+      ? new RegExp(`\\b${escaped}\\b`, "gi")
+      : new RegExp(escaped, "g");
+    cleaned = cleaned.replace(pattern, "");
+  });
+  return cleaned
+    .replace(/\[\s*\]/g, "")
+    .replace(/\s+([,.;:!?])/g, "$1")
+    .replace(/[ \t]{2,}/g, " ")
+    .replace(/[ \t]+\n/g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
 }
 
 function stripChineseText(text) {
@@ -392,17 +549,17 @@ async function generateTikTokCaptions() {
 
     const parsed = extractJson(payload.content || "");
     els.hypicCaptionOutput.value = ensureHashtags(
-      stripChineseText(parsed.hypic_caption),
+      stripChineseText(stripForbiddenCaptionNames(stripLanguageHeadings(parsed.hypic_caption))),
       ["#hypic", "#hypiccreator", "#hypicATETHAT", "#Godpic"],
       5,
     );
     els.capcutCaptionOutput.value = ensureHashtags(
-      stripChineseText(parsed.capcut_caption),
+      stripChineseText(stripForbiddenCaptionNames(stripLanguageHeadings(parsed.capcut_caption))),
       ["#capcut", "#capcutpioneer"],
       5,
     );
     els.capcutReactivationCaptionOutput.value = ensureHashtags(
-      stripChineseText(parsed.capcut_reactivation_caption),
+      stripChineseText(stripForbiddenCaptionNames(stripLanguageHeadings(parsed.capcut_reactivation_caption))),
       ["#capcut", "#capcutpioneer", "#capcutnow"],
       5,
     );
