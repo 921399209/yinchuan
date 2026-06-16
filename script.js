@@ -147,16 +147,33 @@ ${selectedLanguageRules}
 
 文案必须模仿这种结构：
 1. 平台标签必须放在最开头，尤其是 Hypic 文案要像：#hypic #hypiccreator 后面直接接本地语言正文。
-2. 开头不是普通广告句，而是一大段本地达人口吻的情绪化画面描述：根据图片细节写人物、衣服、道具、屏幕/手机/界面、破碎玻璃、光线、背景、氛围、动作、超现实效果、故事感，多用 ✨📸🤖💖😳❤️✍️🤳🌟🖼️ 这类符号，但不要乱用。
-3. 接一段本地语言搜索关键词堆叠：像真实 TikTok SEO 标题一样连续写短句，不要太规整，不要列表标题。关键词要围绕图片里的具体元素，例如手机屏幕、社交媒体主页、人物从屏幕走出来、虚拟维度墙破裂、从线上到现实、玻璃碎片、超现实 AI 照片、AI 修图、同款效果、教程。
-4. 接一段教程/提示词搜索词：告诉用户用 ChatGPT/Gemini/Hypic/CapCut 做同款，必须写具体图片效果。可以保留英文 SEO 词，例如 how to create surreal AI images, break the virtual dimensional wall, online to reality, AI generates cross-dimensional surreal photos, chatgpt photo editing tutorial、chatgpt photo prompt、chatgpt photo trend tutorial、gemini ai photo prompt trend tutorial、gemini ai photo editing tutorial。
+2. 开头不是普通广告句，而是一大段本地达人口吻的情绪化画面描述：根据图片细节写人物、衣服、道具、屏幕/手机/界面、花束/玫瑰、妆容、姿势、光线、阴影、背景、氛围、动作、滤镜效果、超现实效果、故事感，多用 ✨📸🤖💖😳❤️✍️🤳🌟🖼️🌷💫💐 这类符号，但不要乱用。
+3. 接一段本地语言搜索关键词堆叠：像真实 TikTok SEO 标题一样连续写短句，不要太规整，不要列表标题。关键词要围绕图片里的具体元素自动选择，例如手机屏幕、社交媒体主页、人物从屏幕走出来、虚拟维度墙破裂、从线上到现实、玻璃碎片、玫瑰花束、甜美脸部人像、CapCut 滤镜、自然光影、高级感女性、电影感人像、背光发光、lofi dusk、golden hour、暗背景轮廓光、AI 修图、同款效果、教程。
+4. 接一段教程/提示词搜索词：告诉用户用 ChatGPT/Gemini/Hypic/CapCut/TikTok/Instagram/Canva/Meitu/Meta AI 做同款，必须写具体图片效果。可以保留英文 SEO 词，例如 how to create surreal AI images, break the virtual dimensional wall, online to reality, AI generates cross-dimensional surreal photos, rose floral sweet face portrait special effect filter, CapCut rose floral sweet face portrait tutorial, high-end elegant classy woman, luxurious cinematic AI portrait, backlight glow effect, lofi dusk photo edit, golden hour glow, dreamy backlight filter, AI prompt commands, chatgpt photo editing tutorial、chatgpt photo prompt、chatgpt photo trend tutorial、gemini ai photo prompt trend tutorial、gemini ai photo editing tutorial。
 5. Hypic 文案结尾可以带 @hypic_global、@HypicVietnam 这类账号；不要编造真人账号。CapCut 文案可以少量带 CapCut 相关账号/话题。
 6. 整体要像用户给的样例：长段自然文案 + 很多本地搜索短句 + 少量英文 AI/tutorial SEO 词 + 平台话题，而不是分点说明、广告标语、短摘要。
 
-参考样例风格（必须学习结构，不要逐字照抄）：
+参考样例风格 A：维度墙/线上到现实/超现实 AI 图（必须学习结构，不要逐字照抄）：
 How to create surreal AI images that break the virtual dimensional wall and move from online to reality📸｜AI generates cross-dimensional surreal photos🤖｜Image generation artificial intelligence✨｜Use AI to create surreal photos with dimensional wall breaking effect💖 I also wanted to make surreal photos that break the virtual dimensional wall, never expected AI to create such amazing effects😳｜Many people have posted surreal photos with dimensional wall breaking effects❤️ AI tutorial for creating surreal images breaking the virtual dimensional wall✍️｜AI selfie tutorial with cross-dimensional wall breaking effect🤳 Take selfies with virtual dimensional wall breaking effect via AI✍️🤳｜Create cross-dimensional surreal photos with AI💖 Hypic redefines photo editing ChatGPT prompts for surreal AI images breaking the virtual dimensional wall💬｜Use AI to create atmospheric surreal photos that break the virtual dimensional wall from online to reality❤️✍️
 
 如果图片主题类似“手机屏幕/社交媒体主页破裂，人物从线上界面走到现实世界”，必须高频覆盖这些搜索词变体：surreal AI images, virtual dimensional wall, breaking dimensional wall, cross-dimensional surreal photos, online to reality, AI photo editing tutorial, AI selfie tutorial, ChatGPT photo prompt, Gemini AI photo prompt, Hypic photo editing, phone screen breaking effect, social media profile coming to life, character stepping out of phone screen。
+
+参考样例风格 B：玫瑰甜美脸部人像/CapCut 滤镜教程（必须学习结构，不要逐字照抄）：
+Chỉnh sửa ảnh sáng tạo bộ lọc hiệu ứng ảnh chân dung gương mặt ngọt ngào hoa hồng. Hướng dẫn bộ lọc hiệu ứng ảnh chân dung gương mặt ngọt ngào hoa hồng capcut, sử dụng một bức ảnh để tạo hướng dẫn bộ lọc hiệu ứng ảnh chân dung gương mặt ngọt ngào hoa hồng capcut. CapCut rose floral sweet face portrait special effect filter tutorial, use one photo to make CapCut rose floral sweet face portrait special effect filter tutorial. CapCut photo editing creative rose floral sweet face portrait special effect filter.
+
+如果图片主题类似“甜美脸部特写、玫瑰/花束、柔光、清新人像、CapCut 滤镜”，必须高频覆盖这些搜索词变体：rose floral sweet face portrait, sweet face portrait filter, rose flower portrait effect, CapCut special effect filter tutorial, use one photo to make this effect, CapCut photo editing creative filter, rose floral portrait mirror tutorial, AI portrait prompt, photo editing creative rose filter, soft light portrait, flower bouquet portrait。
+
+参考样例风格 C：高级感/贵气/电影感女性人像（必须学习结构，不要逐字照抄）：
+Today I'm sharing techniques for using AI to transform an ordinary look into a luxurious, classy woman ✨💫. AI image generation commands to create luxurious, elegant images that instantly make your photos look more expensive. The resulting images look premium, with a fashion model vibe, calm deep emotions, soft sunlight mixed with shadows, cinematic feel, camera angle and depth of field. Use AI to turn your photo into a high-end, elegant, classy, stylish, and cinematic image.
+
+如果图片主题类似“高级女性人像、贵气妆容、电影感光影、时尚大片、柔和阳光和阴影、黑色衣服、精致表情”，必须高频覆盖这些搜索词变体：luxurious classy woman, high-end elegant AI portrait, premium fashion model vibe, cinematic portrait, soft sunlight and shadows, expensive looking photo, AI image generation commands, AI prompt commands, transform ordinary photo into classy portrait, stylish woman portrait, camera angle and depth of field, professional AI portrait tutorial。
+
+参考样例风格 D：背光 glow / lofi dusk / golden hour 滤镜教程（必须学习结构，不要逐字照抄）：
+Efek cahaya belakang glow dan lofi dusk sekarang menjadi tren edit foto yang sangat populer. Tutorial edit foto AI, cara buat efek cahaya belakang aesthetic yang viral di TikTok & IG, cinematic sunset photo edit, wajah tetap natural tanpa berubah bentuk, cocok untuk foto wisuda, foto bareng pacar, foto bawa bunga, foto di dalam mobil. Dreamy backlight glow effect, tutorial AI glow effect, golden hour glow, easy AI picture editing, aesthetic photo editing tutorial.
+
+如果图片主题类似“暗背景、人物侧脸/半身、背后强光、头发边缘发光、黄昏感、夜景、轮廓光、golden hour、lofi dusk、梦幻背光”，必须高频覆盖这些搜索词变体：backlight glow effect, lofi dusk photo edit, golden hour glow, cinematic sunset photo edit, dreamy backlight filter, light behind body, edit photo cahaya belakang, efek cahaya di belakang badan, AI glow effect tutorial, aesthetic photo editing tutorial, easy AI picture editing, viral TikTok AI photo trend tutorial, CapCut backlight effect, Instagram backlight filter, natural face unchanged, soft flare, warm cinematic glow。
+
+总原则：先判断图片最像 A/B/C/D 哪一种，也可以混合两种；文案必须把“图片描述 + 搜索关键词 + 教程关键词 + 平台/工具名 + 少量英文 SEO 词”揉成连续标题体，不要写成解释文章。
 
 分类规则：
 - hypic_caption 是 Hypic 文案，必须包含这些话题且不能漏：#hypic #hypiccreator #hypicATETHAT #Godpic
