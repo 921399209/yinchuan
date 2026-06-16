@@ -158,9 +158,11 @@ ${selectedLanguageRules}
 6. 句子之间优先使用空格、emoji、竖线 ｜、短句停顿来连接，不要大量使用逗号；整体要像一条真实 TikTok 长 caption，而不是图片标签库。
 7. 图片里的可见细节必须进入“标题句”里，不要只当名词列出来。例如要写成“AI tutorial for making a creator walk out of a cracked phone profile screen”，不要写成“creator, phone, cracked screen”。
 8. 如果图片明显是“人物从手机屏幕、社交主页、虚拟界面、相框、镜子、玻璃或海报里走到现实”，核心效果名必须围绕“虚拟到现实、跨维度、破屏、打破屏幕边界、online to reality、screen to reality、dimensional wall breaking”这类搜索意图自动命名，并结合图片真实细节展开。
-9. 写法要像真实 TikTok 爆款 caption：短句密集、轻微重复、emoji 穿插、可直接发布；不要写成解释文章、广告文案、教程步骤清单或分段标题。
-10. 英文母稿要先生成这一套标题体，再翻译/本地化成已选语言；翻译时保留少量英文 SEO 关键词，例如 AI photo editing tutorial、AI prompt、CapCut template、Hypic filter、ChatGPT prompt、Gemini AI photo trend 等。
-11. 不要把用户提供的案例原句放进输出；只学习它们的结构：话题标签 + 核心效果名 + 图片描述变体 + 工具教程变体 + AI/prompt/template/filter/trend 搜索词 + 少量英文 SEO 词。
+9. 基础 SEO 关键词池必须自然覆盖，尤其是英文母稿和翻译后的文案都要保留一部分英文关键词：AI photo、AI photo editing、AI image generation、surreal、surreal AI images、dimensional wall、virtual dimensional wall、break the dimensional wall、online to reality、screen to reality、selfie、AI selfie tutorial、ChatGPT prompt、ChatGPT photo prompt、Gemini AI photo prompt、Hypic、Hypic filter、Hypic photo editing、AI prompt、photo prompt、template、tutorial、trend。不要一次性硬塞成清单，要分散到标题句里反复出现。
+10. 关键词密度要求：每个非空字段至少包含 8-14 个基础 SEO 关键词或它们的本地化/同义变体；如果图片是超现实、破屏、手机、镜子、海报、人物走出画面、虚拟到现实类效果，必须重点重复 AI photo、surreal、dimensional wall、online to reality、selfie、ChatGPT prompt、Hypic 这些词，每个重点词至少出现 1 次，核心效果词可以出现 2-4 次。
+11. 写法要像真实 TikTok 爆款 caption：短句密集、轻微重复、emoji 穿插、可直接发布；不要写成解释文章、广告文案、教程步骤清单或分段标题。
+12. 英文母稿要先生成这一套标题体，再翻译/本地化成已选语言；翻译时保留少量英文 SEO 关键词，例如 AI photo editing tutorial、AI prompt、CapCut template、Hypic filter、ChatGPT prompt、Gemini AI photo trend 等。
+13. 不要把用户提供的案例原句放进输出；只学习它们的结构：话题标签 + 核心效果名 + 图片描述变体 + 工具教程变体 + AI/prompt/template/filter/trend 搜索词 + 少量英文 SEO 词。
 
 分类规则：
 - hypic_caption 是 Hypic 文案，必须包含这些话题且不能漏：#hypic #hypiccreator #hypicATETHAT #Godpic
@@ -183,6 +185,7 @@ ${selectedLanguageRules}
 - 文案整体要像 TikTok 达人主页里的爆款 SEO 长文案，不要像普通广告文案；允许关键词重复、短语堆叠、教程句反复变体。
 - 每个非空字段至少 70% 的内容必须是完整搜索标题句，不能只输出名词短语。差的写法是“phone portal aesthetic, broken glass cinematic, viral edit look”；好的写法是“How to create a phone screen portal effect with AI 📸｜AI makes a creator walk out from a social profile screen 🤖｜Tutorial for a broken glass screen-to-reality photo edit ✨”。
 - 自检后再输出：如果任意字段读起来像“名词 + 逗号 + 名词”的关键词列表，必须重写成“如何制作/AI生成/教程/prompt/template/filter/trend”标题句瀑布。逗号连接的名词短语不能超过整段的 15%。
+- 自检关键词密度：输出前检查每个非空字段是否缺少 AI photo、surreal、dimensional wall、online to reality、selfie、ChatGPT prompt、Hypic 这类爆款 SEO 词；如果缺少，必须把缺少的词自然补进教程标题句或 prompt 搜索句里。
 - 根据所有所选语言共同输出主体内容；未选择英语时，主体情绪文案不要整段写英文，但允许保留英文 AI/tutorial SEO 关键词和品牌词。
 - CapCut 拉失活文案要更直接地召回用户打开 CapCut，例如强调“现在就打开 CapCut”“这个模板别错过”“用旧照片也能做同款”。
 - hashtag 要少而准。Hypic 文案必须以 #hypic #hypiccreator 开头，并保留 #hypicATETHAT #Godpic；CapCut 文案必须包含 #capcut #capcutpioneer；CapCut 拉失活文案必须包含 #capcut #capcutpioneer #capcutnow。
@@ -224,11 +227,12 @@ function buildCaptionTranslationInstruction(language, englishDraft) {
 2. 翻译后必须保持英文母稿的结构、情绪、画面细节、SEO 关键词堆叠、教程搜索词、emoji、账号和话题。
 3. 主体情绪文案必须使用 ${language}，表达要像本地 TikTok 用户真实发布，不要翻译腔。
 4. 必须保留一部分英文 SEO 短语和品牌词，不要全部翻译掉；保留内容必须来自英文母稿里的工具名、教程词、prompt 词、template 词、filter 词、trend 词和平台词，例如 AI、ChatGPT、Gemini、CapCut、Hypic 这类品牌词。
-5. 不要出现语言名、国家名、地区名或标题名；不要写 [${language}] 这种分隔标题。
-6. 不要输出中文汉字。
-7. ${spec.outputRule}
-8. 如果某个英文母稿字段是空字符串，对应字段也输出空字符串。
-9. 文案类型：${type === "all" ? "全部生成" : type}
+5. 下列爆款 SEO 词在本地化文案中必须保留一部分英文原词，并自然穿插到本地语言句子里：AI photo、surreal、dimensional wall、online to reality、selfie、ChatGPT prompt、ChatGPT photo prompt、Hypic、Hypic filter、AI prompt、photo prompt、tutorial、template、trend。
+6. 不要出现语言名、国家名、地区名或标题名；不要写 [${language}] 这种分隔标题。
+7. 不要输出中文汉字。
+8. ${spec.outputRule}
+9. 如果某个英文母稿字段是空字符串，对应字段也输出空字符串。
+10. 文案类型：${type === "all" ? "全部生成" : type}
 
 英文母稿 JSON：
 ${sourceJson}
