@@ -123,8 +123,8 @@ Additional reconstruction rules:
 }`;
 }
 
-function buildCaptionInstruction() {
-  const languages = getSelectedCaptionLanguages();
+function buildCaptionInstruction(forcedLanguages = null) {
+  const languages = forcedLanguages ? [...forcedLanguages] : getSelectedCaptionLanguages();
   if (!languages.length) languages.push("印尼语");
   const languageText = languages.join("、");
   const languageCount = languages.length;
@@ -390,6 +390,63 @@ function combineCaptionByLanguage(parsedCaption, byLanguage) {
   return parts.length ? parts.join("\n\n") : String(parsedCaption || "");
 }
 
+function cleanCaptionText(text) {
+  return stripChineseText(stripUnselectedEnglish(stripForbiddenCaptionNames(stripLanguageHeadings(text))));
+}
+
+async function requestTikTokCaptionPayload(apiKey, model, languages) {
+  const response = await fetch("/api/analyze-image", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      apiKey,
+      model,
+      image: state.imageDataUrl,
+      prompt: buildCaptionInstruction(languages),
+    }),
+  });
+
+  const payload = await response.json();
+  if (!response.ok) {
+    throw new Error(readableError(payload.error || `接口调用失败：${response.status}`));
+  }
+
+  return extractJson(payload.content || "");
+}
+
+function mergeCaptionPayloads(payloads) {
+  const merged = {
+    hypic_caption: "",
+    capcut_caption: "",
+    capcut_reactivation_caption: "",
+  };
+
+  ["hypic_caption", "capcut_caption", "capcut_reactivation_caption"].forEach((field) => {
+    merged[field] = payloads
+      .map(({ language, parsed }) => {
+        const byLanguage = parsed[`${field}_by_language`];
+        const languageText = byLanguage && typeof byLanguage === "object" ? byLanguage[language] : "";
+        return cleanCaptionText(languageText || parsed[field] || "");
+      })
+      .filter(Boolean)
+      .join("\n\n");
+  });
+
+  return merged;
+}
+
+async function requestTikTokCaptionPayloadsByLanguage(apiKey, model, languages) {
+  const payloads = [];
+  for (const [index, language] of languages.entries()) {
+    setStatus(`生成文案中：${index + 1}/${languages.length}`, "loading");
+    payloads.push({
+      language,
+      parsed: await requestTikTokCaptionPayload(apiKey, model, [language]),
+    });
+  }
+  return payloads;
+}
+
 function stripLanguageHeadings(text) {
   return String(text || "")
     .replace(/^\s*\[[^\]\r\n]{2,40}\]\s*$/gm, "")
@@ -570,41 +627,30 @@ async function generateTikTokCaptions() {
   els.generateCopyButton.textContent = "正在生成文案...";
 
   try {
-    const response = await fetch("/api/analyze-image", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        apiKey,
-        model,
-        image: state.imageDataUrl,
-        prompt: buildCaptionInstruction(),
-      }),
-    });
+    const selectedLanguages = getSelectedCaptionLanguages();
+    const languages = selectedLanguages.length ? selectedLanguages : ["印尼语"];
+    const parsed = languages.length > 1
+      ? mergeCaptionPayloads(await requestTikTokCaptionPayloadsByLanguage(apiKey, model, languages))
+      : await requestTikTokCaptionPayload(apiKey, model, languages);
 
-    const payload = await response.json();
-    if (!response.ok) {
-      throw new Error(readableError(payload.error || `接口调用失败：${response.status}`));
-    }
-
-    const parsed = extractJson(payload.content || "");
     els.hypicCaptionOutput.value = ensureHashtags(
-      stripChineseText(stripUnselectedEnglish(stripForbiddenCaptionNames(stripLanguageHeadings(
+      cleanCaptionText(
         combineCaptionByLanguage(parsed.hypic_caption, parsed.hypic_caption_by_language)
-      )))),
+      ),
       ["#hypic", "#hypiccreator", "#hypicATETHAT", "#Godpic"],
       5,
     );
     els.capcutCaptionOutput.value = ensureHashtags(
-      stripChineseText(stripUnselectedEnglish(stripForbiddenCaptionNames(stripLanguageHeadings(
+      cleanCaptionText(
         combineCaptionByLanguage(parsed.capcut_caption, parsed.capcut_caption_by_language)
-      )))),
+      ),
       ["#capcut", "#capcutpioneer"],
       5,
     );
     els.capcutReactivationCaptionOutput.value = ensureHashtags(
-      stripChineseText(stripUnselectedEnglish(stripForbiddenCaptionNames(stripLanguageHeadings(
+      cleanCaptionText(
         combineCaptionByLanguage(parsed.capcut_reactivation_caption, parsed.capcut_reactivation_caption_by_language)
-      )))),
+      ),
       ["#capcut", "#capcutpioneer", "#capcutnow"],
       5,
     );
