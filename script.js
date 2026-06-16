@@ -33,6 +33,8 @@ const els = {
 let serverKeyConfigured = false;
 const FIXED_MODEL = "gpt-5.4";
 const FIXED_MODEL_LABEL = "GPT5.4";
+const TIKTOK_CAPTION_SAFE_LIMIT = 2100;
+const MULTI_LANGUAGE_CAPTION_TARGET = 2000;
 
 function setStatus(text, tone = "idle") {
   els.apiStatus.textContent = text;
@@ -104,12 +106,12 @@ Additional reconstruction rules:
 }`;
 }
 
-function buildCaptionInstruction(forcedLanguages = null) {
+function buildCaptionInstruction(forcedLanguages = null, options = {}) {
   const languages = forcedLanguages ? [...forcedLanguages] : getSelectedCaptionLanguages();
   if (!languages.length) languages.push("印尼语");
   const languageText = languages.join("、");
   const languageCount = languages.length;
-  const totalCaptionBudget = forcedLanguages ? 2400 : 1800;
+  const totalCaptionBudget = options.totalBudget || (forcedLanguages ? 2400 : 1800);
   const perLanguageBudget = Math.max(120, Math.floor(totalCaptionBudget / languageCount));
   const type = els.copyTypeSelect.value;
   const subject = els.subjectInput.value.trim() || "按图片主体判断";
@@ -215,10 +217,13 @@ ${captionJsonShape}
 }`;
 }
 
-function buildCaptionTranslationInstruction(language, englishDraft) {
+function buildCaptionTranslationInstruction(language, englishDraft, options = {}) {
   const spec = CAPTION_LANGUAGE_SPECS[language] || { nativeName: language, outputRule: `只使用${language}` };
   const type = els.copyTypeSelect.value;
   const sourceJson = JSON.stringify(englishDraft, null, 2);
+  const targetBudgetRule = options.targetBudget
+    ? `\n11. 长度硬要求：每个非空完整文案字段必须控制在约 ${options.targetBudget} 个字符以内。不要把英文母稿逐句完整翻译得太长；优先保留爆款 SEO 词、核心图片细节、教程/prompt/template/filter/trend 句。`
+    : "";
 
   return `你是 TikTok 爆款文案本地化翻译器。请把下面的英文母稿翻译并本地化成 ${language}（${spec.nativeName}）。
 
@@ -232,7 +237,7 @@ function buildCaptionTranslationInstruction(language, englishDraft) {
 7. 不要输出中文汉字。
 8. ${spec.outputRule}
 9. 如果某个英文母稿字段是空字符串，对应字段也输出空字符串。
-10. 文案类型：${type === "all" ? "全部生成" : type}
+10. 文案类型：${type === "all" ? "全部生成" : type}${targetBudgetRule}
 
 英文母稿 JSON：
 ${sourceJson}
@@ -435,6 +440,68 @@ function ensureHashtags(text, requiredTags, maxTags = 5, position = "end") {
     : `${bodyWithoutTags}\n\n${hashtags}`.trim();
 }
 
+function sliceByChars(text, limit) {
+  return Array.from(String(text || "")).slice(0, Math.max(0, limit)).join("");
+}
+
+function trimCaptionBody(text, limit) {
+  const source = String(text || "").trim();
+  if (Array.from(source).length <= limit) return source;
+  const sliced = sliceByChars(source, limit).trim();
+  const separators = ["｜", "。", ".", "!", "?", "؟", "।", "\n"];
+  const minCut = Math.floor(limit * 0.65);
+  let cutIndex = -1;
+
+  separators.forEach((separator) => {
+    const index = sliced.lastIndexOf(separator);
+    if (index > minCut) cutIndex = Math.max(cutIndex, index + separator.length);
+  });
+
+  return (cutIndex > minCut ? sliced.slice(0, cutIndex) : sliced).trim();
+}
+
+function limitMultiLanguageCaption(text, requiredTags, maxTags = 5, position = "end") {
+  const source = String(text || "").trim();
+  if (!source) return "";
+
+  const tagPattern = /#[\p{L}\p{N}_]+/gu;
+  const seen = new Set();
+  const tags = [];
+  requiredTags.forEach((tag) => {
+    const key = tag.toLowerCase();
+    if (!seen.has(key)) {
+      seen.add(key);
+      tags.push(tag);
+    }
+  });
+
+  (source.match(tagPattern) || []).forEach((tag) => {
+    const key = tag.toLowerCase();
+    if (!seen.has(key) && tags.length < maxTags) {
+      seen.add(key);
+      tags.push(tag);
+    }
+  });
+
+  const hashtagText = tags.slice(0, maxTags).join(" ");
+  const separatorLength = position === "start" ? 1 : 2;
+  const bodyLimit = Math.max(300, TIKTOK_CAPTION_SAFE_LIMIT - Array.from(hashtagText).length - separatorLength);
+  const body = trimCaptionBody(
+    source.replace(tagPattern, "").replace(/[ \t]+\n/g, "\n").replace(/\n{3,}/g, "\n\n").trim(),
+    bodyLimit,
+  );
+
+  return position === "start"
+    ? `${hashtagText} ${body}`.trim()
+    : `${body}\n\n${hashtagText}`.trim();
+}
+
+function finalizeCaptionOutput(text, requiredTags, maxTags = 5, position = "end", isMultiLanguage = false) {
+  return isMultiLanguage
+    ? limitMultiLanguageCaption(text, requiredTags, maxTags, position)
+    : ensureHashtags(text, requiredTags, maxTags, position);
+}
+
 function combineCaptionByLanguage(parsedCaption, byLanguage) {
   const languages = getSelectedCaptionLanguages();
   if (!byLanguage || typeof byLanguage !== "object" || Array.isArray(byLanguage)) {
@@ -452,7 +519,7 @@ function cleanCaptionText(text) {
   return stripChineseText(stripForbiddenCaptionNames(stripLanguageHeadings(text)));
 }
 
-async function requestTikTokCaptionPayload(apiKey, model, languages) {
+async function requestTikTokCaptionPayload(apiKey, model, languages, options = {}) {
   const response = await fetch("/api/analyze-image", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -460,7 +527,7 @@ async function requestTikTokCaptionPayload(apiKey, model, languages) {
       apiKey,
       model,
       image: state.imageDataUrl,
-      prompt: buildCaptionInstruction(languages),
+      prompt: buildCaptionInstruction(languages, options),
       temperature: 0.65,
     }),
   });
@@ -473,7 +540,7 @@ async function requestTikTokCaptionPayload(apiKey, model, languages) {
   return extractJson(payload.content || "");
 }
 
-async function requestTikTokCaptionTranslation(apiKey, model, language, englishDraft) {
+async function requestTikTokCaptionTranslation(apiKey, model, language, englishDraft, options = {}) {
   const response = await fetch("/api/analyze-image", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -481,7 +548,7 @@ async function requestTikTokCaptionTranslation(apiKey, model, language, englishD
       apiKey,
       model,
       image: state.imageDataUrl,
-      prompt: buildCaptionTranslationInstruction(language, englishDraft),
+      prompt: buildCaptionTranslationInstruction(language, englishDraft, options),
       temperature: 0.55,
     }),
   });
@@ -517,8 +584,15 @@ function mergeCaptionPayloads(payloads) {
 
 async function requestTikTokCaptionPayloadsByLanguage(apiKey, model, languages) {
   const payloads = [];
+  const isMultiLanguage = languages.length > 1;
+  const totalBudget = isMultiLanguage ? MULTI_LANGUAGE_CAPTION_TARGET : 2400;
+  const perLanguageBudget = isMultiLanguage
+    ? Math.max(220, Math.floor((MULTI_LANGUAGE_CAPTION_TARGET - 180) / languages.length))
+    : totalBudget;
   setStatus("生成英文母稿中", "loading");
-  const englishDraft = await requestTikTokCaptionPayload(apiKey, model, ["英语"]);
+  const englishDraft = await requestTikTokCaptionPayload(apiKey, model, ["英语"], {
+    totalBudget: perLanguageBudget,
+  });
 
   for (const [index, language] of languages.entries()) {
     setStatus(`翻译文案中：${index + 1}/${languages.length}`, "loading");
@@ -526,7 +600,13 @@ async function requestTikTokCaptionPayloadsByLanguage(apiKey, model, languages) 
       language,
       parsed: language === "英语"
         ? englishDraft
-        : await requestTikTokCaptionTranslation(apiKey, model, language, englishDraft),
+        : await requestTikTokCaptionTranslation(
+            apiKey,
+            model,
+            language,
+            englishDraft,
+            isMultiLanguage ? { targetBudget: perLanguageBudget } : {},
+          ),
     });
   }
   return payloads;
@@ -690,31 +770,35 @@ async function generateTikTokCaptions() {
   try {
     const selectedLanguages = getSelectedCaptionLanguages();
     const languages = selectedLanguages.length ? selectedLanguages : ["印尼语"];
-    const parsed = languages.length > 1
-      ? mergeCaptionPayloads(await requestTikTokCaptionPayloadsByLanguage(apiKey, model, languages))
-      : mergeCaptionPayloads(await requestTikTokCaptionPayloadsByLanguage(apiKey, model, languages));
+    const isMultiLanguage = languages.length > 1;
+    const parsed = mergeCaptionPayloads(await requestTikTokCaptionPayloadsByLanguage(apiKey, model, languages));
 
-    els.hypicCaptionOutput.value = ensureHashtags(
+    els.hypicCaptionOutput.value = finalizeCaptionOutput(
       cleanCaptionText(
         combineCaptionByLanguage(parsed.hypic_caption, parsed.hypic_caption_by_language)
       ),
       ["#hypic", "#hypiccreator", "#hypicATETHAT", "#Godpic"],
       8,
       "start",
+      isMultiLanguage,
     );
-    els.capcutCaptionOutput.value = ensureHashtags(
+    els.capcutCaptionOutput.value = finalizeCaptionOutput(
       cleanCaptionText(
         combineCaptionByLanguage(parsed.capcut_caption, parsed.capcut_caption_by_language)
       ),
       ["#capcut", "#capcutpioneer"],
       5,
+      "end",
+      isMultiLanguage,
     );
-    els.capcutReactivationCaptionOutput.value = ensureHashtags(
+    els.capcutReactivationCaptionOutput.value = finalizeCaptionOutput(
       cleanCaptionText(
         combineCaptionByLanguage(parsed.capcut_reactivation_caption, parsed.capcut_reactivation_caption_by_language)
       ),
       ["#capcut", "#capcutpioneer", "#capcutnow"],
       5,
+      "end",
+      isMultiLanguage,
     );
     setStatus("文案完成", "ok");
   } catch (error) {
