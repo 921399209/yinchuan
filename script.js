@@ -1,8 +1,6 @@
 const state = {
   imageDataUrl: "",
   fileName: "",
-  generationImageDataUrl: "",
-  generationFileName: "",
 };
 
 const els = {
@@ -19,18 +17,6 @@ const els = {
   apiHint: document.querySelector("#apiHint"),
   chatgptCnOutput: document.querySelector("#chatgptCnOutput"),
   chatgptEnOutput: document.querySelector("#chatgptEnOutput"),
-  imagePromptInput: document.querySelector("#imagePromptInput"),
-  imageAspectRatioInput: document.querySelector("#imageAspectRatioInput"),
-  generationImageInput: document.querySelector("#generationImageInput"),
-  generationPreviewWrap: document.querySelector("#generationPreviewWrap"),
-  generationPreviewImage: document.querySelector("#generationPreviewImage"),
-  useEnglishPromptButton: document.querySelector("#useEnglishPromptButton"),
-  generateImageButton: document.querySelector("#generateImageButton"),
-  imageGenerationStatus: document.querySelector("#imageGenerationStatus"),
-  generatedImageWrap: document.querySelector("#generatedImageWrap"),
-  generatedImage: document.querySelector("#generatedImage"),
-  generatedImageLink: document.querySelector("#generatedImageLink"),
-  imageGenerationRawOutput: document.querySelector("#imageGenerationRawOutput"),
   hypicCaptionOutput: document.querySelector("#hypicCaptionOutput"),
   capcutCaptionOutput: document.querySelector("#capcutCaptionOutput"),
   capcutReactivationCaptionOutput: document.querySelector("#capcutReactivationCaptionOutput"),
@@ -45,10 +31,8 @@ const els = {
 };
 
 let serverKeyConfigured = false;
-let imageKeyConfigured = false;
 const FIXED_MODEL = "gpt-5.4";
 const FIXED_MODEL_LABEL = "GPT5.4";
-const IMAGE_MODEL = "gpt-image-2";
 
 function setStatus(text, tone = "idle") {
   els.apiStatus.textContent = text;
@@ -60,7 +44,6 @@ async function loadServerConfig() {
     const response = await fetch("/api/config");
     const config = await response.json();
     serverKeyConfigured = Boolean(config.serverKeyConfigured);
-    imageKeyConfigured = Boolean(config.imageKeyConfigured);
     els.modelInput.value = FIXED_MODEL;
     if (serverKeyConfigured) {
       els.apiKeyInput.value = "";
@@ -69,9 +52,7 @@ async function loadServerConfig() {
       els.apiKeyField.classList.add("hidden-field");
       els.apiKeyField.hidden = true;
       els.apiKeyField.style.display = "none";
-      els.apiHint.textContent = imageKeyConfigured
-        ? `站点已配置提示词 Key 和作图 Key，提示词固定使用 ${FIXED_MODEL_LABEL}，作图固定使用 ${IMAGE_MODEL}。`
-        : `站点已配置提示词 Key。作图功能如需单独 Key，请在 Render 添加 LXC_IMAGE_API_KEY。`;
+      els.apiHint.textContent = `站点已配置提示词 Key，提示词固定使用 ${FIXED_MODEL_LABEL}。`;
       setStatus("站点已配置", "ok");
     }
   } catch {
@@ -294,10 +275,30 @@ const CAPTION_LANGUAGE_SPECS = {
     outputRule: "全部正文用自然乌尔都语和乌尔都文书写",
     forbiddenNames: ["Pakistan", "Pakistani", "Urdu", "Urdu language", "اردو", "巴基斯坦", "乌尔都语"],
   },
+  "普什图语": {
+    nativeName: "پښتو",
+    outputRule: "全部正文用自然普什图语和普什图文书写",
+    forbiddenNames: ["Afghanistan", "Afghan", "Pashto", "Pashto language", "پښتو", "阿富汗", "普什图语"],
+  },
+  "波斯语": {
+    nativeName: "فارسی",
+    outputRule: "全部正文用自然波斯语和波斯文书写",
+    forbiddenNames: ["Iran", "Iranian", "Persian", "Farsi", "Persian language", "Farsi language", "فارسی", "伊朗", "波斯语"],
+  },
+  "达里语": {
+    nativeName: "دری",
+    outputRule: "全部正文用自然达里语和达里文书写",
+    forbiddenNames: ["Afghanistan", "Afghan", "Dari", "Dari language", "دری", "阿富汗", "达里语"],
+  },
   "阿拉伯语": {
     nativeName: "العربية",
     outputRule: "全部正文用自然阿拉伯语和阿拉伯文书写",
     forbiddenNames: ["Arab", "Arabic", "Arabic language", "العربية", "阿拉伯", "阿拉伯语"],
+  },
+  "泰米尔语": {
+    nativeName: "தமிழ்",
+    outputRule: "全部正文用自然泰米尔语和泰米尔文书写",
+    forbiddenNames: ["Tamil", "Tamil language", "தமிழ்", "泰米尔语"],
   },
   "英语": {
     nativeName: "English",
@@ -362,6 +363,7 @@ function getForbiddenCaptionNames(selectedLanguages = getSelectedCaptionLanguage
     "语言", "国家", "地区",
     "[Indonesian]", "[Malay]", "[Arabic]", "[English]", "[Nepali]", "[Thai]",
     "[Burmese]", "[Vietnamese]", "[Khmer]", "[Urdu]", "[Russian]", "[Bengali]",
+    "[Pashto]", "[Persian]", "[Farsi]", "[Dari]", "[Tamil]",
     "[Sinhala]", "[Hindi]", "[Filipino]", "[French]", "[Japanese]", "[Korean]", "[German]",
   ];
   const selected = new Set(selectedLanguages);
@@ -516,7 +518,7 @@ async function requestTikTokCaptionPayloadsByLanguage(apiKey, model, languages) 
 function stripLanguageHeadings(text) {
   return String(text || "")
     .replace(/^\s*\[[^\]\r\n]{2,40}\]\s*$/gm, "")
-    .replace(/^\s*(Indonesian|Malay|Arabic|English|Nepali|Thai|Burmese|Vietnamese|Khmer|Urdu|Russian|Bengali|Sinhala|Hindi|Filipino|French|Japanese|Korean|German)\s*[:：]\s*$/gim, "")
+    .replace(/^\s*(Indonesian|Malay|Arabic|English|Nepali|Thai|Burmese|Vietnamese|Khmer|Urdu|Pashto|Persian|Farsi|Dari|Tamil|Russian|Bengali|Sinhala|Hindi|Filipino|French|Japanese|Korean|German)\s*[:：]\s*$/gim, "")
     .replace(/\n{3,}/g, "\n\n")
     .trim();
 }
@@ -586,30 +588,6 @@ function readableError(errorText) {
     return "账号额度、余额或频率限制不足，请检查平台后台。";
   }
   return text;
-}
-
-function extractImageFromText(text) {
-  const source = String(text || "");
-  const markdownMatch = source.match(/!\[[^\]]*\]\(([^)]+)\)/);
-  if (markdownMatch) return markdownMatch[1].trim();
-  const urlMatch = source.match(/https?:\/\/[^\s)"']+/);
-  if (urlMatch) return urlMatch[0];
-  const dataMatch = source.match(/data:image\/[a-zA-Z0-9.+-]+;base64,[A-Za-z0-9+/=]+/);
-  if (dataMatch) return dataMatch[0];
-  return "";
-}
-
-function showGeneratedImage(src) {
-  if (!src) {
-    els.generatedImageWrap.classList.remove("visible");
-    els.generatedImage.removeAttribute("src");
-    els.generatedImageLink.href = "#";
-    return;
-  }
-  els.generatedImage.src = src;
-  els.generatedImageLink.href = src;
-  els.generatedImageLink.download = "generated-image.png";
-  els.generatedImageWrap.classList.add("visible");
 }
 
 async function callThirdPartyApi() {
@@ -733,80 +711,6 @@ async function generateTikTokCaptions() {
   }
 }
 
-async function generateImageWithGptImage2() {
-  const apiKey = els.apiKeyInput.value.trim();
-  const prompt = els.imagePromptInput.value.trim() || els.chatgptEnOutput.value.trim();
-  const aspectRatio = els.imageAspectRatioInput.value;
-
-  if (!apiKey && !imageKeyConfigured) {
-    setStatus("缺少 API Key", "error");
-    els.apiKeyInput.focus();
-    return;
-  }
-
-  if (!state.imageDataUrl) {
-    setStatus("请先上传主体图或参考图", "error");
-    return;
-  }
-
-  if (!state.generationImageDataUrl) {
-    els.imageGenerationStatus.textContent = "请先在 gpt-image-2 区域上传自己的主体图。";
-    els.generationImageInput.focus();
-    return;
-  }
-
-  if (!prompt) {
-    els.imageGenerationStatus.textContent = "请先填写生图提示词，或点击使用英文模板。";
-    return;
-  }
-
-  if (apiKey) localStorage.setItem("cccjin_api_key", apiKey);
-  els.imageGenerationStatus.textContent = "正在调用 gpt-image-2...";
-  els.generateImageButton.disabled = true;
-  els.generateImageButton.textContent = "正在生图...";
-  showGeneratedImage("");
-  if (els.imageGenerationRawOutput) els.imageGenerationRawOutput.value = "";
-
-  try {
-    const response = await fetch("/api/generate-image", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        apiKey,
-        model: IMAGE_MODEL,
-        image: state.generationImageDataUrl,
-        prompt: `${prompt}\n\nImage aspect ratio: ${aspectRatio}. Keep the composition optimized for ${aspectRatio}.`,
-      }),
-    });
-
-    const payload = await response.json();
-    if (!response.ok) {
-      throw new Error(readableError(payload.error || `接口调用失败：${response.status}`));
-    }
-
-    const image = payload.images?.[0] || extractImageFromText(payload.content);
-    if (els.imageGenerationRawOutput) {
-      els.imageGenerationRawOutput.value = payload.content || JSON.stringify(payload.raw || payload, null, 2);
-    }
-    if (image) {
-      showGeneratedImage(image);
-      els.imageGenerationStatus.textContent = "生图完成";
-      setStatus("生图完成", "ok");
-    } else {
-      els.imageGenerationStatus.textContent = "接口已返回，但没有解析到图片。";
-      setStatus("已返回文本", "ok");
-    }
-  } catch (error) {
-    const message = readableError(error.message);
-    els.imageGenerationStatus.textContent = `调用失败：${message}`;
-    if (els.imageGenerationRawOutput) els.imageGenerationRawOutput.value = `调用失败：${message}`;
-    setStatus("调用失败", "error");
-  } finally {
-    els.generateImageButton.disabled = false;
-    els.generateImageButton.textContent = "调用 gpt-image-2 生图";
-  }
-}
-
 function loadFile(file) {
   if (!file || !file.type.startsWith("image/")) return;
   const reader = new FileReader();
@@ -816,19 +720,6 @@ function loadFile(file) {
     els.previewImage.src = reader.result;
     els.previewWrap.classList.add("visible");
     setStatus("图片已就绪", "ok");
-  };
-  reader.readAsDataURL(file);
-}
-
-function loadGenerationFile(file) {
-  if (!file || !file.type.startsWith("image/")) return;
-  const reader = new FileReader();
-  reader.onload = () => {
-    state.generationImageDataUrl = reader.result;
-    state.generationFileName = file.name;
-    els.generationPreviewImage.src = reader.result;
-    els.generationPreviewWrap.classList.add("visible");
-    els.imageGenerationStatus.textContent = "主体图已就绪，可以调用 gpt-image-2。";
   };
   reader.readAsDataURL(file);
 }
@@ -847,10 +738,6 @@ loadServerConfig();
 
 els.input.addEventListener("change", (event) => {
   loadFile(event.target.files[0]);
-});
-
-els.generationImageInput.addEventListener("change", (event) => {
-  loadGenerationFile(event.target.files[0]);
 });
 
 ["dragenter", "dragover"].forEach((eventName) => {
@@ -878,11 +765,6 @@ document.addEventListener("paste", (event) => {
 
 els.generateButton.addEventListener("click", callThirdPartyApi);
 els.generateCopyButton.addEventListener("click", generateTikTokCaptions);
-els.useEnglishPromptButton.addEventListener("click", () => {
-  els.imagePromptInput.value = els.chatgptEnOutput.value.trim();
-  els.imagePromptInput.focus();
-});
-els.generateImageButton.addEventListener("click", generateImageWithGptImage2);
 
 els.copyAllButton.addEventListener("click", () => {
   copyText(

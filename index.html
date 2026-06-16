@@ -66,7 +66,11 @@
                 <label><input type="checkbox" name="copyLanguage" value="越南语" /> 越南语</label>
                 <label><input type="checkbox" name="copyLanguage" value="高棉语" /> 柬埔寨语言（高棉语）</label>
                 <label><input type="checkbox" name="copyLanguage" value="乌尔都语" /> 巴基斯坦语言（乌尔都语）</label>
+                <label><input type="checkbox" name="copyLanguage" value="普什图语" /> 普什图语</label>
+                <label><input type="checkbox" name="copyLanguage" value="波斯语" /> 波斯语</label>
+                <label><input type="checkbox" name="copyLanguage" value="达里语" /> 达里语</label>
                 <label><input type="checkbox" name="copyLanguage" value="阿拉伯语" /> 阿拉伯语</label>
+                <label><input type="checkbox" name="copyLanguage" value="泰米尔语" /> 泰米尔语</label>
                 <label><input type="checkbox" name="copyLanguage" value="英语" /> 英语</label>
                 <label><input type="checkbox" name="copyLanguage" value="俄语" /> 俄语</label>
                 <label><input type="checkbox" name="copyLanguage" value="尼泊尔语" /> 尼泊尔语</label>
@@ -131,44 +135,6 @@
               <textarea id="chatgptEnOutput" spellcheck="false" placeholder="Includes Main Prompt, Negative Prompt, Suggested Model / Style, and Suggested Parameters"></textarea>
             </section>
           </div>
-
-          <section class="image-generator-panel">
-            <div class="section-title">
-              <span>gpt-image-2 直接生图</span>
-              <button class="text-button" id="useEnglishPromptButton" type="button">使用英文提示词</button>
-            </div>
-            <label class="drop-zone subject-drop-zone" id="generationDropZone" for="generationImageInput">
-              <input id="generationImageInput" type="file" accept="image/*" />
-              <span class="drop-icon">+</span>
-              <strong>上传自己的主体图</strong>
-              <small>这里上传你要替换进去的人物/产品照片，不是参考效果图。</small>
-            </label>
-            <div class="generation-preview-wrap" id="generationPreviewWrap">
-              <img id="generationPreviewImage" alt="生图主体图预览" />
-            </div>
-            <label>
-              生图提示词
-              <textarea id="imagePromptInput" spellcheck="false" placeholder="可以粘贴上面的英文模板，或自己修改后调用 gpt-image-2 生成图片"></textarea>
-            </label>
-            <label>
-              图片尺寸
-              <select id="imageAspectRatioInput">
-                <option value="9:16">9:16</option>
-                <option value="1:1">1:1</option>
-                <option value="4:3">4:3</option>
-                <option value="16:9">16:9</option>
-              </select>
-            </label>
-            <div class="image-actions">
-              <button class="ghost-button" id="generateImageButton" type="button">调用 gpt-image-2 生图</button>
-              <span class="field-hint" id="imageGenerationStatus"></span>
-            </div>
-            <div class="generated-image-wrap" id="generatedImageWrap">
-              <img id="generatedImage" alt="gpt-image-2 生成结果" />
-              <a id="generatedImageLink" href="#" download="generated-image.png">保存图片</a>
-            </div>
-            <textarea id="imageGenerationRawOutput" class="raw-output" spellcheck="false" readonly hidden></textarea>
-          </section>
 
           <div class="section-title copy-section-title">
             <span>TikTok 文案分类</span>

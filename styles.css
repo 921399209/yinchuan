@@ -429,19 +429,6 @@ textarea {
   background: var(--soft);
 }
 
-.image-generator-panel {
-  display: grid;
-  gap: 14px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 16px;
-  background: #fffdf7;
-}
-
-.image-generator-panel textarea {
-  min-height: 150px;
-}
-
 .mini-upload {
   border: 1px dashed #b7c2bf;
   border-radius: 8px;
@@ -452,63 +439,6 @@ textarea {
 .mini-upload input {
   height: auto;
   padding: 9px;
-}
-
-.generation-preview-wrap {
-  display: none;
-}
-
-.generation-preview-wrap.visible {
-  display: block;
-}
-
-.generation-preview-wrap img {
-  width: min(260px, 100%);
-  max-height: 260px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  object-fit: contain;
-  background: #1f2326;
-}
-
-.image-actions {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.image-actions .ghost-button {
-  flex: 0 0 auto;
-}
-
-.generated-image-wrap {
-  display: none;
-  gap: 10px;
-}
-
-.generated-image-wrap.visible {
-  display: grid;
-}
-
-.generated-image-wrap img {
-  width: min(520px, 100%);
-  max-height: 620px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  object-fit: contain;
-  background: #1f2326;
-}
-
-.generated-image-wrap a {
-  width: fit-content;
-  color: var(--accent-dark);
-  font-size: 13px;
-  font-weight: 800;
-}
-
-.raw-output {
-  min-height: 120px;
-  background: #fff;
 }
 
 .prompt-card textarea {
@@ -603,15 +533,6 @@ textarea {
   .secondary-button {
     min-height: 48px;
     padding: 0 14px;
-  }
-
-  .image-actions {
-    align-items: stretch;
-    flex-direction: column;
-  }
-
-  .image-actions .ghost-button {
-    width: 100%;
   }
 
   input,

@@ -10,11 +10,7 @@ services:
         value: 0.0.0.0
       - key: PROMPT_API_BASE_URL
         value: https://weibo.com.de/v1
-      - key: IMAGE_API_BASE_URL
-        value: https://weibo.com.de/v1
       - key: LXC_MODEL
         value: gpt5.5
       - key: LXC_API_KEY
-        sync: false
-      - key: LXC_IMAGE_API_KEY
         sync: false
