@@ -47,6 +47,13 @@ class Handler(SimpleHTTPRequestHandler):
             image = data["image"]
             prompt = data["prompt"]
 
+            temperature = data.get("temperature", 0.2)
+            try:
+                temperature = float(temperature)
+            except (TypeError, ValueError):
+                temperature = 0.2
+            temperature = max(0.0, min(1.0, temperature))
+
             upstream_body = {
                 "model": model,
                 "messages": [
@@ -58,7 +65,7 @@ class Handler(SimpleHTTPRequestHandler):
                         ],
                     }
                 ],
-                "temperature": 0.2,
+                "temperature": temperature,
             }
 
             request = urllib.request.Request(
