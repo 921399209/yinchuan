@@ -145,46 +145,15 @@ ${selectedLanguageRules}
 禁止在输出文案里出现的国家名、地区名、语言名、标题名：${forbiddenNames}
 英语限制：${englishRule}
 
-文案必须模仿这种结构：
-1. 平台标签必须放在最开头，尤其是 Hypic 文案要像：#hypic #hypiccreator 后面直接接本地语言正文。
-2. 开头不是普通广告句，而是一大段本地达人口吻的情绪化画面描述：根据图片细节写人物、衣服、道具、屏幕/手机/界面、花束/玫瑰、妆容、姿势、光线、阴影、背景、氛围、动作、滤镜效果、超现实效果、故事感，多用 ✨📸🤖💖😳❤️✍️🤳🌟🖼️🌷💫💐 这类符号，但不要乱用。
-3. 接一段本地语言搜索关键词堆叠：像真实 TikTok SEO 标题一样连续写短句，不要太规整，不要列表标题。关键词要围绕图片里的具体元素自动选择，例如手机屏幕、社交媒体主页、人物从屏幕走出来、虚拟维度墙破裂、从线上到现实、玻璃碎片、玫瑰花束、甜美脸部人像、CapCut 滤镜、自然光影、高级感女性、电影感人像、背光发光、lofi dusk、golden hour、暗背景轮廓光、AI 修图、同款效果、教程。
-4. 接一段教程/提示词搜索词：告诉用户用 ChatGPT/Gemini/Hypic/CapCut/TikTok/Instagram/Canva/Meitu/Meta AI 做同款，必须写具体图片效果。可以保留英文 SEO 词，例如 how to create surreal AI images, break the virtual dimensional wall, online to reality, AI generates cross-dimensional surreal photos, rose floral sweet face portrait special effect filter, CapCut rose floral sweet face portrait tutorial, high-end elegant classy woman, luxurious cinematic AI portrait, backlight glow effect, lofi dusk photo edit, golden hour glow, dreamy backlight filter, eye close-up photos, AI eye close-up templates, CapCut AI eye close-up, AI prompt commands, chatgpt photo editing tutorial、chatgpt photo prompt、chatgpt photo trend tutorial、gemini ai photo prompt trend tutorial、gemini ai photo editing tutorial。
-5. Hypic 文案结尾可以带 @hypic_global、@HypicVietnam 这类账号；不要编造真人账号。CapCut 文案可以少量带 CapCut 相关账号/话题。
-6. 整体要像用户给的样例：长段自然文案 + 很多本地搜索短句 + 少量英文 AI/tutorial SEO 词 + 平台话题，而不是分点说明、广告标语、短摘要。
-
-参考样例风格 A：维度墙/线上到现实/超现实 AI 图（必须学习结构，不要逐字照抄）：
-How to create surreal AI images that break the virtual dimensional wall and move from online to reality📸｜AI generates cross-dimensional surreal photos🤖｜Image generation artificial intelligence✨｜Use AI to create surreal photos with dimensional wall breaking effect💖 I also wanted to make surreal photos that break the virtual dimensional wall, never expected AI to create such amazing effects😳｜Many people have posted surreal photos with dimensional wall breaking effects❤️ AI tutorial for creating surreal images breaking the virtual dimensional wall✍️｜AI selfie tutorial with cross-dimensional wall breaking effect🤳 Take selfies with virtual dimensional wall breaking effect via AI✍️🤳｜Create cross-dimensional surreal photos with AI💖 Hypic redefines photo editing ChatGPT prompts for surreal AI images breaking the virtual dimensional wall💬｜Use AI to create atmospheric surreal photos that break the virtual dimensional wall from online to reality❤️✍️
-
-如果图片主题类似“手机屏幕/社交媒体主页破裂，人物从线上界面走到现实世界”，必须高频覆盖这些搜索词变体：surreal AI images, virtual dimensional wall, breaking dimensional wall, cross-dimensional surreal photos, online to reality, AI photo editing tutorial, AI selfie tutorial, ChatGPT photo prompt, Gemini AI photo prompt, Hypic photo editing, phone screen breaking effect, social media profile coming to life, character stepping out of phone screen。
-
-参考样例风格 B：玫瑰甜美脸部人像/CapCut 滤镜教程（必须学习结构，不要逐字照抄）：
-Chỉnh sửa ảnh sáng tạo bộ lọc hiệu ứng ảnh chân dung gương mặt ngọt ngào hoa hồng. Hướng dẫn bộ lọc hiệu ứng ảnh chân dung gương mặt ngọt ngào hoa hồng capcut, sử dụng một bức ảnh để tạo hướng dẫn bộ lọc hiệu ứng ảnh chân dung gương mặt ngọt ngào hoa hồng capcut. CapCut rose floral sweet face portrait special effect filter tutorial, use one photo to make CapCut rose floral sweet face portrait special effect filter tutorial. CapCut photo editing creative rose floral sweet face portrait special effect filter.
-
-如果图片主题类似“甜美脸部特写、玫瑰/花束、柔光、清新人像、CapCut 滤镜”，必须高频覆盖这些搜索词变体：rose floral sweet face portrait, sweet face portrait filter, rose flower portrait effect, CapCut special effect filter tutorial, use one photo to make this effect, CapCut photo editing creative filter, rose floral portrait mirror tutorial, AI portrait prompt, photo editing creative rose filter, soft light portrait, flower bouquet portrait。
-
-参考样例风格 C：高级感/贵气/电影感女性人像（必须学习结构，不要逐字照抄）：
-Today I'm sharing techniques for using AI to transform an ordinary look into a luxurious, classy woman ✨💫. AI image generation commands to create luxurious, elegant images that instantly make your photos look more expensive. The resulting images look premium, with a fashion model vibe, calm deep emotions, soft sunlight mixed with shadows, cinematic feel, camera angle and depth of field. Use AI to turn your photo into a high-end, elegant, classy, stylish, and cinematic image.
-
-如果图片主题类似“高级女性人像、贵气妆容、电影感光影、时尚大片、柔和阳光和阴影、黑色衣服、精致表情”，必须高频覆盖这些搜索词变体：luxurious classy woman, high-end elegant AI portrait, premium fashion model vibe, cinematic portrait, soft sunlight and shadows, expensive looking photo, AI image generation commands, AI prompt commands, transform ordinary photo into classy portrait, stylish woman portrait, camera angle and depth of field, professional AI portrait tutorial。
-
-参考样例风格 D：背光 glow / lofi dusk / golden hour 滤镜教程（必须学习结构，不要逐字照抄）：
-Efek cahaya belakang glow dan lofi dusk sekarang menjadi tren edit foto yang sangat populer. Tutorial edit foto AI, cara buat efek cahaya belakang aesthetic yang viral di TikTok & IG, cinematic sunset photo edit, wajah tetap natural tanpa berubah bentuk, cocok untuk foto wisuda, foto bareng pacar, foto bawa bunga, foto di dalam mobil. Dreamy backlight glow effect, tutorial AI glow effect, golden hour glow, easy AI picture editing, aesthetic photo editing tutorial.
-
-如果图片主题类似“暗背景、人物侧脸/半身、背后强光、头发边缘发光、黄昏感、夜景、轮廓光、golden hour、lofi dusk、梦幻背光”，必须高频覆盖这些搜索词变体：backlight glow effect, lofi dusk photo edit, golden hour glow, cinematic sunset photo edit, dreamy backlight filter, light behind body, edit photo cahaya belakang, efek cahaya di belakang badan, AI glow effect tutorial, aesthetic photo editing tutorial, easy AI picture editing, viral TikTok AI photo trend tutorial, CapCut backlight effect, Instagram backlight filter, natural face unchanged, soft flare, warm cinematic glow。
-
-参考样例风格 E：眼睛特写 / eye close-up / CapCut AI 模板（必须学习结构，不要逐字照抄）：
-Create eye close-up photos with AI ❤️✍️ Create atmospheric eye close-up photos with AI 📝 They posted eye close-up photos ✍️ Tutorial for making eye close-ups with AI 💬 Prompts for AI eye close-up photos 🤳 Tutorial for taking eye close-up selfies with AI ❤️🖼️ AI eye close-up templates 🌟 Create stunning eye close-up photos with AI 📸 How to take eye close-up photos｜AI generates eye close-up photos｜Image generation AI｜Create eye close-up photos with CapCut AI。
-
-如果图片主题类似“眼睛超近距离特写、睫毛、眉毛、瞳孔反光、眼部妆容、高清皮肤纹理、单眼 macro close-up”，必须高频覆盖这些搜索词变体：eye close-up photos, AI eye close-up photos, eye close-up selfie tutorial, AI eye close-up templates, prompts for AI eye close-up photos, CapCut AI eye close-up, how to take eye close-up photos, stunning eye close-up, atmospheric eye close-up, macro eye photo, eyelash close-up, iris reflection, eye makeup close-up, viral TikTok eye photo trend, image generation AI。
-
-这些爆款文案的共同点（必须执行）：
-- 像标题搜索词瀑布，不像普通段落文章；允许同义词反复出现，但每次换一种说法。
-- 先抓核心效果名，再围绕“怎么做、用什么工具、一张照片、AI prompt、tutorial、template、filter、trend”连续扩展。
-- 图片细节必须进入关键词，例如眼睛、睫毛、玫瑰、背光、手机屏幕、花束、车内、暗背景、柔光、电影感。
-- 每条文案都要像可直接发 TikTok 的爆款 SEO caption，平台词、教程词、效果词、情绪词混在一起。
-
-总原则：先判断图片最像 A/B/C/D/E 哪一种，也可以混合两种；文案必须把“图片描述 + 搜索关键词 + 教程关键词 + 平台/工具名 + 少量英文 SEO 词”揉成连续标题体，不要写成解释文章。
+文案必须学习爆款 TikTok 标题体的写法，不要照抄任何示例原文：
+1. 平台标签必须贴合文案类型放在开头或结尾。Hypic 文案优先以 #hypic #hypiccreator 开头；CapCut 文案优先以 #capcut #capcutpioneer 或 #capcutnow 开头。
+2. 先识别图片核心效果，再提炼一个“核心效果名”，例如：维度墙超现实、玫瑰甜美人像、贵气电影感人像、背光 glow、眼睛特写。不要固定这些类别，必须根据图片自动命名。
+3. 用标题搜索词瀑布写法，而不是普通说明文：围绕核心效果连续写 15-30 个短句/短语，同义重复但每次换说法。
+4. 每个短句都要服务搜索：包含效果词、工具词、教程词、模板词、prompt 词、trend 词、how-to 词、平台词。
+5. 图片里的可见细节必须进入关键词，例如人物姿势、表情、眼睛/睫毛/妆容、花束/玫瑰、手机屏幕、破碎玻璃、背光、暗背景、柔光、车内、电影感、夕阳、滤镜质感等。
+6. 写法要像真实 TikTok 爆款 caption：短句密集、轻微重复、emoji 穿插、可直接发布；不要写成解释文章、广告文案、教程步骤清单或分段标题。
+7. 英文母稿要先生成这一套标题体，再翻译/本地化成已选语言；翻译时保留少量英文 SEO 关键词，例如 AI photo editing tutorial、AI prompt、CapCut template、Hypic filter、ChatGPT prompt、Gemini AI photo trend 等。
+8. 不要把用户提供的案例原句放进输出；只学习它们的结构：话题标签 + 核心效果名 + 图片描述变体 + 工具教程变体 + AI/prompt/template/filter/trend 搜索词 + 少量英文 SEO 词。
 
 分类规则：
 - hypic_caption 是 Hypic 文案，必须包含这些话题且不能漏：#hypic #hypiccreator #hypicATETHAT #Godpic
@@ -245,7 +214,7 @@ function buildCaptionTranslationInstruction(language, englishDraft) {
 1. 英文母稿是唯一内容来源。不要重新创作新主题，不要换图片细节，不要少翻译段落。
 2. 翻译后必须保持英文母稿的结构、情绪、画面细节、SEO 关键词堆叠、教程搜索词、emoji、账号和话题。
 3. 主体情绪文案必须使用 ${language}，表达要像本地 TikTok 用户真实发布，不要翻译腔。
-4. 必须保留一部分英文 SEO 短语和品牌词，不要全部翻译掉，例如 how to create surreal AI images、break the virtual dimensional wall、online to reality、cross-dimensional surreal photos、chatgpt photo editing tutorial、chatgpt photo prompt、chatgpt photo trend tutorial、gemini ai photo prompt trend tutorial、gemini ai photo editing tutorial、AI、ChatGPT、Gemini、CapCut、Hypic。
+4. 必须保留一部分英文 SEO 短语和品牌词，不要全部翻译掉；保留内容必须来自英文母稿里的工具名、教程词、prompt 词、template 词、filter 词、trend 词和平台词，例如 AI、ChatGPT、Gemini、CapCut、Hypic 这类品牌词。
 5. 不要出现语言名、国家名、地区名或标题名；不要写 [${language}] 这种分隔标题。
 6. 不要输出中文汉字。
 7. ${spec.outputRule}
