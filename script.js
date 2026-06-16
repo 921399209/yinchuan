@@ -109,7 +109,7 @@ function buildCaptionInstruction(forcedLanguages = null) {
   if (!languages.length) languages.push("印尼语");
   const languageText = languages.join("、");
   const languageCount = languages.length;
-  const totalCaptionBudget = forcedLanguages ? 1800 : 1200;
+  const totalCaptionBudget = forcedLanguages ? 2400 : 1800;
   const perLanguageBudget = Math.max(120, Math.floor(totalCaptionBudget / languageCount));
   const type = els.copyTypeSelect.value;
   const subject = els.subjectInput.value.trim() || "按图片主体判断";
@@ -148,12 +148,15 @@ ${selectedLanguageRules}
 文案必须学习爆款 TikTok 标题体的写法，不要照抄任何示例原文：
 1. 平台标签必须贴合文案类型放在开头或结尾。Hypic 文案优先以 #hypic #hypiccreator 开头；CapCut 文案优先以 #capcut #capcutpioneer 或 #capcutnow 开头。
 2. 先识别图片核心效果，再提炼一个“核心效果名”，例如：维度墙超现实、玫瑰甜美人像、贵气电影感人像、背光 glow、眼睛特写。不要固定这些类别，必须根据图片自动命名。
-3. 用标题搜索词瀑布写法，而不是普通说明文：围绕核心效果连续写 15-30 个短句/短语，同义重复但每次换说法。
-4. 每个短句都要服务搜索：包含效果词、工具词、教程词、模板词、prompt 词、trend 词、how-to 词、平台词。
-5. 图片里的可见细节必须进入关键词，例如人物姿势、表情、眼睛/睫毛/妆容、花束/玫瑰、手机屏幕、破碎玻璃、背光、暗背景、柔光、车内、电影感、夕阳、滤镜质感等。
-6. 写法要像真实 TikTok 爆款 caption：短句密集、轻微重复、emoji 穿插、可直接发布；不要写成解释文章、广告文案、教程步骤清单或分段标题。
-7. 英文母稿要先生成这一套标题体，再翻译/本地化成已选语言；翻译时保留少量英文 SEO 关键词，例如 AI photo editing tutorial、AI prompt、CapCut template、Hypic filter、ChatGPT prompt、Gemini AI photo trend 等。
-8. 不要把用户提供的案例原句放进输出；只学习它们的结构：话题标签 + 核心效果名 + 图片描述变体 + 工具教程变体 + AI/prompt/template/filter/trend 搜索词 + 少量英文 SEO 词。
+3. 用标题搜索词瀑布写法，而不是普通说明文：围绕核心效果连续写 18-35 个“标题句/搜索句”，同义重复但每次换说法。
+4. 禁止写成逗号分隔的关键词清单。每一句都要像 TikTok 标题，必须有动词或教程意图，例如“how to create...”“AI generates...”“use AI to make...”“tutorial for...”“prompt for...”“template for...”这类句式；不同语言要改成本地用户自然会搜索的句式。
+5. 英文母稿必须先写出爆款节奏：开头 3-5 句 how-to/search title，中间 1-2 句“我也想做同款/没想到 AI 能做到这种效果”的情绪钩子，后面继续堆叠教程词、模板词、prompt 词、filter 词、trend 词、平台词。
+6. 句子之间优先使用空格、emoji、竖线 ｜、短句停顿来连接，不要大量使用逗号；整体要像一条真实 TikTok 长 caption，而不是图片标签库。
+7. 图片里的可见细节必须进入关键词，例如人物姿势、表情、眼睛/睫毛/妆容、花束/玫瑰、手机屏幕、破碎玻璃、背光、暗背景、柔光、车内、电影感、夕阳、滤镜质感等。
+8. 如果图片明显是“人物从手机屏幕、社交主页、虚拟界面、相框、镜子、玻璃或海报里走到现实”，核心效果名必须围绕“虚拟到现实、跨维度、破屏、打破屏幕边界、online to reality、screen to reality、dimensional wall breaking”这类搜索意图自动命名，并结合图片真实细节展开。
+9. 写法要像真实 TikTok 爆款 caption：短句密集、轻微重复、emoji 穿插、可直接发布；不要写成解释文章、广告文案、教程步骤清单或分段标题。
+10. 英文母稿要先生成这一套标题体，再翻译/本地化成已选语言；翻译时保留少量英文 SEO 关键词，例如 AI photo editing tutorial、AI prompt、CapCut template、Hypic filter、ChatGPT prompt、Gemini AI photo trend 等。
+11. 不要把用户提供的案例原句放进输出；只学习它们的结构：话题标签 + 核心效果名 + 图片描述变体 + 工具教程变体 + AI/prompt/template/filter/trend 搜索词 + 少量英文 SEO 词。
 
 分类规则：
 - hypic_caption 是 Hypic 文案，必须包含这些话题且不能漏：#hypic #hypiccreator #hypicATETHAT #Godpic
@@ -174,6 +177,7 @@ ${selectedLanguageRules}
 - 不要重复翻译同一句太多次；每种语言表达同一个卖点即可，句子短、节奏快、适合 TikTok。
 - 每个非空字段必须是可直接复制到 TikTok 的完整发布文案，但总长度必须控制在约 ${totalCaptionBudget} 字符。
 - 文案整体要像 TikTok 达人主页里的爆款 SEO 长文案，不要像普通广告文案；允许关键词重复、短语堆叠、教程句反复变体。
+- 每个非空字段至少 70% 的内容必须是完整搜索标题句，不能只输出名词短语。差的写法是“phone portal aesthetic, broken glass cinematic, viral edit look”；好的写法是“How to create a phone screen portal effect with AI 📸｜AI makes a creator walk out from a social profile screen 🤖｜Tutorial for a broken glass screen-to-reality photo edit ✨”。
 - 根据所有所选语言共同输出主体内容；未选择英语时，主体情绪文案不要整段写英文，但允许保留英文 AI/tutorial SEO 关键词和品牌词。
 - CapCut 拉失活文案要更直接地召回用户打开 CapCut，例如强调“现在就打开 CapCut”“这个模板别错过”“用旧照片也能做同款”。
 - hashtag 要少而准。Hypic 文案必须以 #hypic #hypiccreator 开头，并保留 #hypicATETHAT #Godpic；CapCut 文案必须包含 #capcut #capcutpioneer；CapCut 拉失活文案必须包含 #capcut #capcutpioneer #capcutnow。
