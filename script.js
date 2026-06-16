@@ -583,7 +583,6 @@ function mergeCaptionPayloads(payloads) {
 }
 
 async function requestTikTokCaptionPayloadsByLanguage(apiKey, model, languages) {
-  const payloads = [];
   const isMultiLanguage = languages.length > 1;
   const totalBudget = isMultiLanguage ? MULTI_LANGUAGE_CAPTION_TARGET : 2400;
   const perLanguageBudget = isMultiLanguage
@@ -594,22 +593,23 @@ async function requestTikTokCaptionPayloadsByLanguage(apiKey, model, languages) 
     totalBudget: perLanguageBudget,
   });
 
-  for (const [index, language] of languages.entries()) {
-    setStatus(`翻译文案中：${index + 1}/${languages.length}`, "loading");
-    payloads.push({
-      language,
-      parsed: language === "英语"
-        ? englishDraft
-        : await requestTikTokCaptionTranslation(
-            apiKey,
-            model,
-            language,
-            englishDraft,
-            isMultiLanguage ? { targetBudget: perLanguageBudget } : {},
-          ),
-    });
+  if (languages.length === 1 && languages[0] === "英语") {
+    return [{ language: "英语", parsed: englishDraft }];
   }
-  return payloads;
+
+  setStatus(isMultiLanguage ? `并行翻译 ${languages.length} 种语言中` : "翻译文案中", "loading");
+  return Promise.all(languages.map(async (language) => ({
+    language,
+    parsed: language === "英语"
+      ? englishDraft
+      : await requestTikTokCaptionTranslation(
+          apiKey,
+          model,
+          language,
+          englishDraft,
+          isMultiLanguage ? { targetBudget: perLanguageBudget } : {},
+        ),
+  })));
 }
 
 function stripLanguageHeadings(text) {
