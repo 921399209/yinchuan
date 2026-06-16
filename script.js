@@ -147,11 +147,16 @@ ${selectedLanguageRules}
 
 文案必须模仿这种结构：
 1. 平台标签必须放在最开头，尤其是 Hypic 文案要像：#hypic #hypiccreator 后面直接接本地语言正文。
-2. 开头不是普通广告句，而是一大段本地达人口吻的情绪化画面描述：根据图片细节写人物、衣服、首饰、花束、姿势、光线、背景、氛围、关系感、祝福感或故事感，多用 ✨🤍👰‍♀️👑🌹📸🥹💖 这类符号，但不要乱用。
-3. 接一段本地语言搜索关键词堆叠：像真实 TikTok SEO 文案一样连续写短句，不要太规整，不要列表标题。关键词要围绕图片里的具体元素，例如服装、妆容、花束、婚礼/订婚/写真、AI 修图、同款效果、教程。
-4. 接一段教程/提示词搜索词：告诉用户用 ChatGPT/Gemini/Hypic/CapCut 做同款，必须写具体图片效果。可以保留英文 SEO 词，例如 chatgpt photo editing tutorial、chatgpt photo prompt、chatgpt photo trend tutorial、gemini ai photo prompt trend tutorial、gemini ai photo editing tutorial。
+2. 开头不是普通广告句，而是一大段本地达人口吻的情绪化画面描述：根据图片细节写人物、衣服、道具、屏幕/手机/界面、破碎玻璃、光线、背景、氛围、动作、超现实效果、故事感，多用 ✨📸🤖💖😳❤️✍️🤳🌟🖼️ 这类符号，但不要乱用。
+3. 接一段本地语言搜索关键词堆叠：像真实 TikTok SEO 标题一样连续写短句，不要太规整，不要列表标题。关键词要围绕图片里的具体元素，例如手机屏幕、社交媒体主页、人物从屏幕走出来、虚拟维度墙破裂、从线上到现实、玻璃碎片、超现实 AI 照片、AI 修图、同款效果、教程。
+4. 接一段教程/提示词搜索词：告诉用户用 ChatGPT/Gemini/Hypic/CapCut 做同款，必须写具体图片效果。可以保留英文 SEO 词，例如 how to create surreal AI images, break the virtual dimensional wall, online to reality, AI generates cross-dimensional surreal photos, chatgpt photo editing tutorial、chatgpt photo prompt、chatgpt photo trend tutorial、gemini ai photo prompt trend tutorial、gemini ai photo editing tutorial。
 5. Hypic 文案结尾可以带 @hypic_global、@HypicVietnam 这类账号；不要编造真人账号。CapCut 文案可以少量带 CapCut 相关账号/话题。
 6. 整体要像用户给的样例：长段自然文案 + 很多本地搜索短句 + 少量英文 AI/tutorial SEO 词 + 平台话题，而不是分点说明、广告标语、短摘要。
+
+参考样例风格（必须学习结构，不要逐字照抄）：
+How to create surreal AI images that break the virtual dimensional wall and move from online to reality📸｜AI generates cross-dimensional surreal photos🤖｜Image generation artificial intelligence✨｜Use AI to create surreal photos with dimensional wall breaking effect💖 I also wanted to make surreal photos that break the virtual dimensional wall, never expected AI to create such amazing effects😳｜Many people have posted surreal photos with dimensional wall breaking effects❤️ AI tutorial for creating surreal images breaking the virtual dimensional wall✍️｜AI selfie tutorial with cross-dimensional wall breaking effect🤳 Take selfies with virtual dimensional wall breaking effect via AI✍️🤳｜Create cross-dimensional surreal photos with AI💖 Hypic redefines photo editing ChatGPT prompts for surreal AI images breaking the virtual dimensional wall💬｜Use AI to create atmospheric surreal photos that break the virtual dimensional wall from online to reality❤️✍️
+
+如果图片主题类似“手机屏幕/社交媒体主页破裂，人物从线上界面走到现实世界”，必须高频覆盖这些搜索词变体：surreal AI images, virtual dimensional wall, breaking dimensional wall, cross-dimensional surreal photos, online to reality, AI photo editing tutorial, AI selfie tutorial, ChatGPT photo prompt, Gemini AI photo prompt, Hypic photo editing, phone screen breaking effect, social media profile coming to life, character stepping out of phone screen。
 
 分类规则：
 - hypic_caption 是 Hypic 文案，必须包含这些话题且不能漏：#hypic #hypiccreator #hypicATETHAT #Godpic
@@ -212,7 +217,7 @@ function buildCaptionTranslationInstruction(language, englishDraft) {
 1. 英文母稿是唯一内容来源。不要重新创作新主题，不要换图片细节，不要少翻译段落。
 2. 翻译后必须保持英文母稿的结构、情绪、画面细节、SEO 关键词堆叠、教程搜索词、emoji、账号和话题。
 3. 主体情绪文案必须使用 ${language}，表达要像本地 TikTok 用户真实发布，不要翻译腔。
-4. 可以保留英文 SEO 短语和品牌词，例如 chatgpt photo editing tutorial、chatgpt photo prompt、chatgpt photo trend tutorial、gemini ai photo prompt trend tutorial、gemini ai photo editing tutorial、AI、ChatGPT、Gemini、CapCut、Hypic。
+4. 必须保留一部分英文 SEO 短语和品牌词，不要全部翻译掉，例如 how to create surreal AI images、break the virtual dimensional wall、online to reality、cross-dimensional surreal photos、chatgpt photo editing tutorial、chatgpt photo prompt、chatgpt photo trend tutorial、gemini ai photo prompt trend tutorial、gemini ai photo editing tutorial、AI、ChatGPT、Gemini、CapCut、Hypic。
 5. 不要出现语言名、国家名、地区名或标题名；不要写 [${language}] 这种分隔标题。
 6. 不要输出中文汉字。
 7. ${spec.outputRule}
