@@ -128,7 +128,7 @@ function buildCaptionInstruction(forcedLanguages = null) {
   if (!languages.length) languages.push("印尼语");
   const languageText = languages.join("、");
   const languageCount = languages.length;
-  const totalCaptionBudget = 850;
+  const totalCaptionBudget = forcedLanguages ? 1800 : 1200;
   const perLanguageBudget = Math.max(120, Math.floor(totalCaptionBudget / languageCount));
   const type = els.copyTypeSelect.value;
   const subject = els.subjectInput.value.trim() || "按图片主体判断";
@@ -142,7 +142,7 @@ function buildCaptionInstruction(forcedLanguages = null) {
   const englishSelected = languages.includes("英语");
   const englishRule = englishSelected
     ? `英语已被选择，所以英语只能占全部正文约 1 / ${languageCount}，不能超过其他语言。`
-    : "英语没有被选择，所以正文里禁止出现任何英语句子、英语单词、英语缩写、英文教程词、英文搜索词、英文品牌名；只允许在最终 hashtag 区保留平台强制话题。";
+    : "英语没有被选择时，主体情绪文案必须用已选语言写；但允许保留 TikTok SEO 常用英文短语和品牌词，例如 chatgpt photo editing tutorial、chatgpt photo prompt、gemini ai photo prompt trend tutorial、gemini ai photo editing tutorial、AI、ChatGPT、Gemini、CapCut、Hypic。";
   const captionJsonShape = languages
     .map((language) => `    "${language}": "这一段只用${language}写，不要写语言名或标题"`)
     .join(",\n");
@@ -165,13 +165,12 @@ ${selectedLanguageRules}
 英语限制：${englishRule}
 
 文案必须模仿这种结构：
-1. 平台标签可放在开头，尤其是 CapCut/Hypic 类文案，像 TikTok 爆款文案一样先吃平台流量。
-2. 开头一句强钩子：类似“我教你怎么用 AI 做这个 trend，很简单”，要贴合图片效果。
-3. 一大段用户搜索关键词堆叠：不要太规整，要像真实 TikTok SEO 文案，连续重复不同搜索写法。关键词必须翻译成已选语言；未选择英语时，不要写 tutorial、trend、prompt、search keywords 这类英文普通词。AI、ChatGPT、Gemini、CapCut、Hypic 作为品牌/产品名可以保留。
-4. 一段自然文案：解释这个图片效果、画面风格、适合什么人、为什么容易火，可以多用 ✨📸🔥💖✍️ 等符号增强 TikTok 感。
-5. 一段“图片提示词/教程”：告诉用户把自己的照片发给 ChatGPT/Gemini/Hypic/CapCut 后如何生成同款，必须根据图片内容写具体效果。
-6. 一组相关词语：和图片内容、人物、场景、风格、教程、AI 生成有关，可以用 · 或 ｜ 连接。
-7. 结尾 hashtags：必须包含指定强制话题，但每条文案 hashtag 总数不能超过 5 个。图片相关标签最多只补 1-3 个，不要堆标签。
+1. 平台标签必须放在最开头，尤其是 Hypic 文案要像：#hypic #hypiccreator 后面直接接本地语言正文。
+2. 开头不是普通广告句，而是一大段本地达人口吻的情绪化画面描述：根据图片细节写人物、衣服、首饰、花束、姿势、光线、背景、氛围、关系感、祝福感或故事感，多用 ✨🤍👰‍♀️👑🌹📸🥹💖 这类符号，但不要乱用。
+3. 接一段本地语言搜索关键词堆叠：像真实 TikTok SEO 文案一样连续写短句，不要太规整，不要列表标题。关键词要围绕图片里的具体元素，例如服装、妆容、花束、婚礼/订婚/写真、AI 修图、同款效果、教程。
+4. 接一段教程/提示词搜索词：告诉用户用 ChatGPT/Gemini/Hypic/CapCut 做同款，必须写具体图片效果。可以保留英文 SEO 词，例如 chatgpt photo editing tutorial、chatgpt photo prompt、chatgpt photo trend tutorial、gemini ai photo prompt trend tutorial、gemini ai photo editing tutorial。
+5. Hypic 文案结尾可以带 @hypic_global、@HypicVietnam 这类账号；不要编造真人账号。CapCut 文案可以少量带 CapCut 相关账号/话题。
+6. 整体要像用户给的样例：长段自然文案 + 很多本地搜索短句 + 少量英文 AI/tutorial SEO 词 + 平台话题，而不是分点说明、广告标语、短摘要。
 
 分类规则：
 - hypic_caption 是 Hypic 文案，必须包含这些话题且不能漏：#hypic #hypiccreator #hypicATETHAT #Godpic
@@ -192,9 +191,9 @@ ${selectedLanguageRules}
 - 不要重复翻译同一句太多次；每种语言表达同一个卖点即可，句子短、节奏快、适合 TikTok。
 - 每个非空字段必须是可直接复制到 TikTok 的完整发布文案，但总长度必须控制在约 ${totalCaptionBudget} 字符。
 - 文案整体要像 TikTok 达人主页里的爆款 SEO 长文案，不要像普通广告文案；允许关键词重复、短语堆叠、教程句反复变体。
-- 根据所有所选语言共同输出主体内容；未选择英语时，正文里不要出现任何英文单词或英文品牌名。选择英语时，英文也只能按平均份额出现。
+- 根据所有所选语言共同输出主体内容；未选择英语时，主体情绪文案不要整段写英文，但允许保留英文 AI/tutorial SEO 关键词和品牌词。
 - CapCut 拉失活文案要更直接地召回用户打开 CapCut，例如强调“现在就打开 CapCut”“这个模板别错过”“用旧照片也能做同款”。
-- hashtag 要少而准，并且每个字段只在最后统一放一组 hashtag，不要在每个语言段重复放标签。Hypic 文案固定 4 个强制标签后最多再加 1 个；CapCut 文案固定 2 个强制标签后最多再加 3 个；CapCut 拉失活文案固定 3 个强制标签后最多再加 2 个。
+- hashtag 要少而准。Hypic 文案必须以 #hypic #hypiccreator 开头，并保留 #hypicATETHAT #Godpic；CapCut 文案必须包含 #capcut #capcutpioneer；CapCut 拉失活文案必须包含 #capcut #capcutpioneer #capcutnow。
 - 不要为了凑字数写太长。多语言时优先压缩 SEO 关键词堆叠和教程句，保证总字符长度稳定。
 - 不要 Markdown，不要解释，不要分代码块。
 - 绝对不要输出中文汉字。当前文案语言选项不包含中文，所以 hypic_caption、capcut_caption、capcut_reactivation_caption 三个字段里都不能出现中文标题、中文解释、中文小节名或中文标签。
@@ -202,6 +201,7 @@ ${selectedLanguageRules}
 - 正文里不要出现国家名、地区名或语言名，例如 Indonesia、Indonesian、Thailand、Thai、Malaysia、Malay、Cambodia、Khmer、Pakistan、Urdu、Sri Lanka、Sinhala 等；只写对应语言的真实文案内容。
 - 不要编造真实姓名，图片里看不清身份时用通用称呼。
 - 图片提示词要具体到这张图的视觉元素，不能只写“生成同款图片”。
+- 如果是阿拉伯语、乌尔都语等 RTL 语言，正文必须自然流畅，像本地用户真实发布，不要翻译腔。
 
 输出必须是 JSON：
 {
@@ -349,7 +349,7 @@ function extractJson(text) {
   }
 }
 
-function ensureHashtags(text, requiredTags, maxTags = 5) {
+function ensureHashtags(text, requiredTags, maxTags = 5, position = "end") {
   const source = String(text || "").trim();
   if (!source) return "";
   const tagPattern = /#[\p{L}\p{N}_]+/gu;
@@ -374,7 +374,10 @@ function ensureHashtags(text, requiredTags, maxTags = 5) {
     }
   });
 
-  return `${bodyWithoutTags}\n\n${collected.slice(0, maxTags).join(" ")}`.trim();
+  const hashtags = collected.slice(0, maxTags).join(" ");
+  return position === "start"
+    ? `${hashtags} ${bodyWithoutTags}`.trim()
+    : `${bodyWithoutTags}\n\n${hashtags}`.trim();
 }
 
 function combineCaptionByLanguage(parsedCaption, byLanguage) {
@@ -391,7 +394,7 @@ function combineCaptionByLanguage(parsedCaption, byLanguage) {
 }
 
 function cleanCaptionText(text) {
-  return stripChineseText(stripUnselectedEnglish(stripForbiddenCaptionNames(stripLanguageHeadings(text))));
+  return stripChineseText(stripForbiddenCaptionNames(stripLanguageHeadings(text)));
 }
 
 async function requestTikTokCaptionPayload(apiKey, model, languages) {
@@ -638,7 +641,8 @@ async function generateTikTokCaptions() {
         combineCaptionByLanguage(parsed.hypic_caption, parsed.hypic_caption_by_language)
       ),
       ["#hypic", "#hypiccreator", "#hypicATETHAT", "#Godpic"],
-      5,
+      8,
+      "start",
     );
     els.capcutCaptionOutput.value = ensureHashtags(
       cleanCaptionText(
