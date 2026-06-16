@@ -220,6 +220,44 @@ ${captionJsonShape}
 }`;
 }
 
+function buildCaptionTranslationInstruction(language, englishDraft) {
+  const spec = CAPTION_LANGUAGE_SPECS[language] || { nativeName: language, outputRule: `只使用${language}` };
+  const type = els.copyTypeSelect.value;
+  const sourceJson = JSON.stringify(englishDraft, null, 2);
+
+  return `你是 TikTok 爆款文案本地化翻译器。请把下面的英文母稿翻译并本地化成 ${language}（${spec.nativeName}）。
+
+核心流程：
+1. 英文母稿是唯一内容来源。不要重新创作新主题，不要换图片细节，不要少翻译段落。
+2. 翻译后必须保持英文母稿的结构、情绪、画面细节、SEO 关键词堆叠、教程搜索词、emoji、账号和话题。
+3. 主体情绪文案必须使用 ${language}，表达要像本地 TikTok 用户真实发布，不要翻译腔。
+4. 可以保留英文 SEO 短语和品牌词，例如 chatgpt photo editing tutorial、chatgpt photo prompt、chatgpt photo trend tutorial、gemini ai photo prompt trend tutorial、gemini ai photo editing tutorial、AI、ChatGPT、Gemini、CapCut、Hypic。
+5. 不要出现语言名、国家名、地区名或标题名；不要写 [${language}] 这种分隔标题。
+6. 不要输出中文汉字。
+7. ${spec.outputRule}
+8. 如果某个英文母稿字段是空字符串，对应字段也输出空字符串。
+9. 文案类型：${type === "all" ? "全部生成" : type}
+
+英文母稿 JSON：
+${sourceJson}
+
+输出必须是 JSON，不要 Markdown，不要解释：
+{
+  "hypic_caption": "翻译后的 Hypic 完整文案",
+  "capcut_caption": "翻译后的 CapCut 完整文案",
+  "capcut_reactivation_caption": "翻译后的 CapCut 拉失活完整文案",
+  "hypic_caption_by_language": {
+    "${language}": "翻译后的 Hypic 完整文案"
+  },
+  "capcut_caption_by_language": {
+    "${language}": "翻译后的 CapCut 完整文案"
+  },
+  "capcut_reactivation_caption_by_language": {
+    "${language}": "翻译后的 CapCut 拉失活完整文案"
+  }
+}`;
+}
+
 const CAPTION_LANGUAGE_SPECS = {
   "印尼语": {
     nativeName: "Bahasa Indonesia",
@@ -417,6 +455,26 @@ async function requestTikTokCaptionPayload(apiKey, model, languages) {
   return extractJson(payload.content || "");
 }
 
+async function requestTikTokCaptionTranslation(apiKey, model, language, englishDraft) {
+  const response = await fetch("/api/analyze-image", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      apiKey,
+      model,
+      image: state.imageDataUrl,
+      prompt: buildCaptionTranslationInstruction(language, englishDraft),
+    }),
+  });
+
+  const payload = await response.json();
+  if (!response.ok) {
+    throw new Error(readableError(payload.error || `接口调用失败：${response.status}`));
+  }
+
+  return extractJson(payload.content || "");
+}
+
 function mergeCaptionPayloads(payloads) {
   const merged = {
     hypic_caption: "",
@@ -440,11 +498,16 @@ function mergeCaptionPayloads(payloads) {
 
 async function requestTikTokCaptionPayloadsByLanguage(apiKey, model, languages) {
   const payloads = [];
+  setStatus("生成英文母稿中", "loading");
+  const englishDraft = await requestTikTokCaptionPayload(apiKey, model, ["英语"]);
+
   for (const [index, language] of languages.entries()) {
-    setStatus(`生成文案中：${index + 1}/${languages.length}`, "loading");
+    setStatus(`翻译文案中：${index + 1}/${languages.length}`, "loading");
     payloads.push({
       language,
-      parsed: await requestTikTokCaptionPayload(apiKey, model, [language]),
+      parsed: language === "英语"
+        ? englishDraft
+        : await requestTikTokCaptionTranslation(apiKey, model, language, englishDraft),
     });
   }
   return payloads;
@@ -634,7 +697,7 @@ async function generateTikTokCaptions() {
     const languages = selectedLanguages.length ? selectedLanguages : ["印尼语"];
     const parsed = languages.length > 1
       ? mergeCaptionPayloads(await requestTikTokCaptionPayloadsByLanguage(apiKey, model, languages))
-      : await requestTikTokCaptionPayload(apiKey, model, languages);
+      : mergeCaptionPayloads(await requestTikTokCaptionPayloadsByLanguage(apiKey, model, languages));
 
     els.hypicCaptionOutput.value = ensureHashtags(
       cleanCaptionText(
