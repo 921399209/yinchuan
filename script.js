@@ -149,7 +149,7 @@ ${selectedLanguageRules}
 1. 平台标签必须放在最开头，尤其是 Hypic 文案要像：#hypic #hypiccreator 后面直接接本地语言正文。
 2. 开头不是普通广告句，而是一大段本地达人口吻的情绪化画面描述：根据图片细节写人物、衣服、道具、屏幕/手机/界面、花束/玫瑰、妆容、姿势、光线、阴影、背景、氛围、动作、滤镜效果、超现实效果、故事感，多用 ✨📸🤖💖😳❤️✍️🤳🌟🖼️🌷💫💐 这类符号，但不要乱用。
 3. 接一段本地语言搜索关键词堆叠：像真实 TikTok SEO 标题一样连续写短句，不要太规整，不要列表标题。关键词要围绕图片里的具体元素自动选择，例如手机屏幕、社交媒体主页、人物从屏幕走出来、虚拟维度墙破裂、从线上到现实、玻璃碎片、玫瑰花束、甜美脸部人像、CapCut 滤镜、自然光影、高级感女性、电影感人像、背光发光、lofi dusk、golden hour、暗背景轮廓光、AI 修图、同款效果、教程。
-4. 接一段教程/提示词搜索词：告诉用户用 ChatGPT/Gemini/Hypic/CapCut/TikTok/Instagram/Canva/Meitu/Meta AI 做同款，必须写具体图片效果。可以保留英文 SEO 词，例如 how to create surreal AI images, break the virtual dimensional wall, online to reality, AI generates cross-dimensional surreal photos, rose floral sweet face portrait special effect filter, CapCut rose floral sweet face portrait tutorial, high-end elegant classy woman, luxurious cinematic AI portrait, backlight glow effect, lofi dusk photo edit, golden hour glow, dreamy backlight filter, AI prompt commands, chatgpt photo editing tutorial、chatgpt photo prompt、chatgpt photo trend tutorial、gemini ai photo prompt trend tutorial、gemini ai photo editing tutorial。
+4. 接一段教程/提示词搜索词：告诉用户用 ChatGPT/Gemini/Hypic/CapCut/TikTok/Instagram/Canva/Meitu/Meta AI 做同款，必须写具体图片效果。可以保留英文 SEO 词，例如 how to create surreal AI images, break the virtual dimensional wall, online to reality, AI generates cross-dimensional surreal photos, rose floral sweet face portrait special effect filter, CapCut rose floral sweet face portrait tutorial, high-end elegant classy woman, luxurious cinematic AI portrait, backlight glow effect, lofi dusk photo edit, golden hour glow, dreamy backlight filter, eye close-up photos, AI eye close-up templates, CapCut AI eye close-up, AI prompt commands, chatgpt photo editing tutorial、chatgpt photo prompt、chatgpt photo trend tutorial、gemini ai photo prompt trend tutorial、gemini ai photo editing tutorial。
 5. Hypic 文案结尾可以带 @hypic_global、@HypicVietnam 这类账号；不要编造真人账号。CapCut 文案可以少量带 CapCut 相关账号/话题。
 6. 整体要像用户给的样例：长段自然文案 + 很多本地搜索短句 + 少量英文 AI/tutorial SEO 词 + 平台话题，而不是分点说明、广告标语、短摘要。
 
@@ -173,7 +173,18 @@ Efek cahaya belakang glow dan lofi dusk sekarang menjadi tren edit foto yang san
 
 如果图片主题类似“暗背景、人物侧脸/半身、背后强光、头发边缘发光、黄昏感、夜景、轮廓光、golden hour、lofi dusk、梦幻背光”，必须高频覆盖这些搜索词变体：backlight glow effect, lofi dusk photo edit, golden hour glow, cinematic sunset photo edit, dreamy backlight filter, light behind body, edit photo cahaya belakang, efek cahaya di belakang badan, AI glow effect tutorial, aesthetic photo editing tutorial, easy AI picture editing, viral TikTok AI photo trend tutorial, CapCut backlight effect, Instagram backlight filter, natural face unchanged, soft flare, warm cinematic glow。
 
-总原则：先判断图片最像 A/B/C/D 哪一种，也可以混合两种；文案必须把“图片描述 + 搜索关键词 + 教程关键词 + 平台/工具名 + 少量英文 SEO 词”揉成连续标题体，不要写成解释文章。
+参考样例风格 E：眼睛特写 / eye close-up / CapCut AI 模板（必须学习结构，不要逐字照抄）：
+Create eye close-up photos with AI ❤️✍️ Create atmospheric eye close-up photos with AI 📝 They posted eye close-up photos ✍️ Tutorial for making eye close-ups with AI 💬 Prompts for AI eye close-up photos 🤳 Tutorial for taking eye close-up selfies with AI ❤️🖼️ AI eye close-up templates 🌟 Create stunning eye close-up photos with AI 📸 How to take eye close-up photos｜AI generates eye close-up photos｜Image generation AI｜Create eye close-up photos with CapCut AI。
+
+如果图片主题类似“眼睛超近距离特写、睫毛、眉毛、瞳孔反光、眼部妆容、高清皮肤纹理、单眼 macro close-up”，必须高频覆盖这些搜索词变体：eye close-up photos, AI eye close-up photos, eye close-up selfie tutorial, AI eye close-up templates, prompts for AI eye close-up photos, CapCut AI eye close-up, how to take eye close-up photos, stunning eye close-up, atmospheric eye close-up, macro eye photo, eyelash close-up, iris reflection, eye makeup close-up, viral TikTok eye photo trend, image generation AI。
+
+这些爆款文案的共同点（必须执行）：
+- 像标题搜索词瀑布，不像普通段落文章；允许同义词反复出现，但每次换一种说法。
+- 先抓核心效果名，再围绕“怎么做、用什么工具、一张照片、AI prompt、tutorial、template、filter、trend”连续扩展。
+- 图片细节必须进入关键词，例如眼睛、睫毛、玫瑰、背光、手机屏幕、花束、车内、暗背景、柔光、电影感。
+- 每条文案都要像可直接发 TikTok 的爆款 SEO caption，平台词、教程词、效果词、情绪词混在一起。
+
+总原则：先判断图片最像 A/B/C/D/E 哪一种，也可以混合两种；文案必须把“图片描述 + 搜索关键词 + 教程关键词 + 平台/工具名 + 少量英文 SEO 词”揉成连续标题体，不要写成解释文章。
 
 分类规则：
 - hypic_caption 是 Hypic 文案，必须包含这些话题且不能漏：#hypic #hypiccreator #hypicATETHAT #Godpic
