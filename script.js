@@ -143,6 +143,9 @@ function buildCaptionInstruction() {
   const englishRule = englishSelected
     ? `英语已被选择，所以英语只能占全部正文约 1 / ${languageCount}，不能超过其他语言。`
     : "英语没有被选择，所以正文里禁止出现任何英语句子、英语单词、英语缩写、英文教程词、英文搜索词、英文品牌名；只允许在最终 hashtag 区保留平台强制话题。";
+  const captionJsonShape = languages
+    .map((language) => `    "${language}": "这一段只用${language}写，不要写语言名或标题"`)
+    .join(",\n");
 
   return `你是一个 TikTok 短视频文案生成器。请根据用户上传的图片，生成适合 TikTok 发布的长文案。文案语言必须严格只使用这些已选语言：${languageText}。只生成一条可直接发布的混合语言文案，不要按语言拆成多个版本。
 
@@ -178,6 +181,8 @@ ${selectedLanguageRules}
 写作要求：
 - 如果文案类型是全部生成，就三个字段都输出完整文案。
 - 如果只选择某一种类型，仍然输出 JSON 三个字段，但未选择的字段填空字符串。
+- 每个非空文案字段都必须先在对应的 *_by_language 对象里为每一个已选语言各写一段。对象 key 必须完整包含：${languageText}。不能少任何一个 key，不能把 5 种语言合并到 1 个 key 里。
+- hypic_caption、capcut_caption、capcut_reactivation_caption 三个最终字段必须由对应 *_by_language 里的所有语言段按已选顺序拼接而成。最终字段里不要出现语言名或标题。
 - 长度控制是最高优先级之一：选择 1 个语言和选择 5 个语言时，每个非空字段的总字符数必须接近，不要按语言数量成倍增长。
 - 如果只选择 1 个语言，该语言可以写得完整一些；如果选择多个语言，必须只生成一条混合语言文案，把所有选中语言写在同一条发布文案里，不要输出多个语言版本。
 - 如果选择了多种语言，每一个非空字段都必须让所有选中语言交替出现。必须按“语言 1 一句、语言 2 一句、语言 3 一句……”的循环方式写，直到每种语言篇幅接近。不能只写其中几种语言，不能让某一种语言明显更多，不能混入任何未选语言。
@@ -202,7 +207,16 @@ ${selectedLanguageRules}
 {
   "hypic_caption": "Hypic 完整文案",
   "capcut_caption": "CapCut 完整文案",
-  "capcut_reactivation_caption": "CapCut 拉失活完整文案"
+  "capcut_reactivation_caption": "CapCut 拉失活完整文案",
+  "hypic_caption_by_language": {
+${captionJsonShape}
+  },
+  "capcut_caption_by_language": {
+${captionJsonShape}
+  },
+  "capcut_reactivation_caption_by_language": {
+${captionJsonShape}
+  }
 }`;
 }
 
@@ -361,6 +375,19 @@ function ensureHashtags(text, requiredTags, maxTags = 5) {
   });
 
   return `${bodyWithoutTags}\n\n${collected.slice(0, maxTags).join(" ")}`.trim();
+}
+
+function combineCaptionByLanguage(parsedCaption, byLanguage) {
+  const languages = getSelectedCaptionLanguages();
+  if (!byLanguage || typeof byLanguage !== "object" || Array.isArray(byLanguage)) {
+    return String(parsedCaption || "");
+  }
+
+  const parts = languages
+    .map((language) => String(byLanguage[language] || "").trim())
+    .filter(Boolean);
+
+  return parts.length ? parts.join("\n\n") : String(parsedCaption || "");
 }
 
 function stripLanguageHeadings(text) {
@@ -561,17 +588,23 @@ async function generateTikTokCaptions() {
 
     const parsed = extractJson(payload.content || "");
     els.hypicCaptionOutput.value = ensureHashtags(
-      stripChineseText(stripUnselectedEnglish(stripForbiddenCaptionNames(stripLanguageHeadings(parsed.hypic_caption)))),
+      stripChineseText(stripUnselectedEnglish(stripForbiddenCaptionNames(stripLanguageHeadings(
+        combineCaptionByLanguage(parsed.hypic_caption, parsed.hypic_caption_by_language)
+      )))),
       ["#hypic", "#hypiccreator", "#hypicATETHAT", "#Godpic"],
       5,
     );
     els.capcutCaptionOutput.value = ensureHashtags(
-      stripChineseText(stripUnselectedEnglish(stripForbiddenCaptionNames(stripLanguageHeadings(parsed.capcut_caption)))),
+      stripChineseText(stripUnselectedEnglish(stripForbiddenCaptionNames(stripLanguageHeadings(
+        combineCaptionByLanguage(parsed.capcut_caption, parsed.capcut_caption_by_language)
+      )))),
       ["#capcut", "#capcutpioneer"],
       5,
     );
     els.capcutReactivationCaptionOutput.value = ensureHashtags(
-      stripChineseText(stripUnselectedEnglish(stripForbiddenCaptionNames(stripLanguageHeadings(parsed.capcut_reactivation_caption)))),
+      stripChineseText(stripUnselectedEnglish(stripForbiddenCaptionNames(stripLanguageHeadings(
+        combineCaptionByLanguage(parsed.capcut_reactivation_caption, parsed.capcut_reactivation_caption_by_language)
+      )))),
       ["#capcut", "#capcutpioneer", "#capcutnow"],
       5,
     );
